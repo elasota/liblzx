@@ -1,0 +1,11 @@
+EXPORTS
+	FCICreate
+	FCIAddFile
+	FCIFlushFolder
+	FCIFlushCabinet
+	FCIDestroy
+	FDICreate
+	FDIIsCabinet
+	FDICopy
+	FDIDestroy
+	FDITruncateCabinet
