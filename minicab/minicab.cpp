@@ -16,6 +16,8 @@
 #include <algorithm>
 #include <limits>
 
+#include "wimlib.h"
+
 wchar_t *ConvertToUTF16(const char *path)
 {
 	int requiredSize = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, path, -1, nullptr, 0);
@@ -500,6 +502,9 @@ int RecursiveAdd(HFCI fci, const wchar_t *path)
 		return AddFile(fci, path, pathLength, truncateSize);
 	}
 }
+
+char myData[32768];
+char myCompressedData[1024];
 
 int wmain(int argc, const wchar_t **argv)
 {

@@ -1,3 +1,5 @@
+rlzx is based on compression code from wimlib
+
 wimlib (meaning all programs, scripts, libraries, documentation, and other files
 that are part of the wimlib project -- not just the "libwim" library) may be
 redistributed and/or modified under the terms of the GNU General Public License;

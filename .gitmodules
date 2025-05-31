@@ -1,0 +1,4 @@
+[submodule "wimlib"]
+	path = wimlib
+	url = https://github.com/elasota/wimlib.git
+	branch = master
