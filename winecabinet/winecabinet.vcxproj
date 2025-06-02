@@ -62,24 +62,28 @@
     <Import Project="..\WineCompat.props" />
     <Import Project="..\Common.props" />
     <Import Project="..\zlib_public.props" />
+    <Import Project="..\wimlib_public.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\WineCompat.props" />
     <Import Project="..\Common.props" />
     <Import Project="..\zlib_public.props" />
+    <Import Project="..\wimlib_public.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\WineCompat.props" />
     <Import Project="..\Common.props" />
     <Import Project="..\zlib_public.props" />
+    <Import Project="..\wimlib_public.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\WineCompat.props" />
     <Import Project="..\Common.props" />
     <Import Project="..\zlib_public.props" />
+    <Import Project="..\wimlib_public.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -144,6 +148,9 @@
     <ClCompile Include="..\wine\dlls\cabinet\fdi.c" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\rlzx\rlzx.vcxproj">
+      <Project>{aaf53ba5-e903-49aa-9de7-134846c59cd9}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\winecompat\winecompat.vcxproj">
       <Project>{3bfc3acc-c316-4a80-acff-619b5c223629}</Project>
     </ProjectReference>

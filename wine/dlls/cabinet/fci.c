@@ -49,6 +49,8 @@ There is still some work to be done:
 #include "wine/list.h"
 #include "wine/debug.h"
 
+#include "wimlib.h"
+
 WINE_DEFAULT_DEBUG_CHANNEL(cabinet);
 
 #ifdef WORDS_BIGENDIAN
@@ -187,6 +189,8 @@ typedef struct FCI_Int
   cab_ULONG          folders_data_size;   /* total size of data contained in the current folders */
   TCOMP              compression;
   cab_UWORD        (*compress)(struct FCI_Int *);
+  void             (*compress_shutdown)(struct FCI_Int *);
+  struct wimlib_compressor *lzx_compressor;
 } FCI_Int;
 
 #define FCI_INT_MAGIC 0xfcfcfc05
@@ -907,6 +911,10 @@ static cab_UWORD compress_NONE( FCI_Int *fci )
     return fci->cdata_in;
 }
 
+static void shutdown_NONE(FCI_Int *fci)
+{
+}
+
 static void *zalloc( void *opaque, unsigned int items, unsigned int size )
 {
     FCI_Int *fci = opaque;
@@ -943,6 +951,45 @@ static cab_UWORD compress_MSZIP( FCI_Int *fci )
     return stream.total_out + 2;
 }
 
+static void shutdown_MSZIP( FCI_Int *fci )
+{
+}
+
+static void shutdown_LZX(FCI_Int *fci)
+{
+    wimlib_free_compressor(fci->lzx_compressor);
+    fci->lzx_compressor = NULL;
+}
+
+static cab_UWORD compress_LZX(FCI_Int *fci)
+{
+    size_t compressed_size = 0;
+
+    if (fci->cDataBlocks == 0) {
+        int window_size_bits = LZXCompressionWindowFromTCOMP(fci->compression);
+        size_t window_size = 1 << window_size_bits;
+
+        /* First block, restart compression */
+        if (fci->lzx_compressor) {
+            shutdown_LZX(fci->lzx_compressor);
+        }
+
+        switch (wimlib_create_compressor(WIMLIB_COMPRESSION_TYPE_LZX_CAB, window_size, 0, &fci->lzx_compressor)) {
+        case WIMLIB_ERR_SUCCESS:
+            break;
+        case WIMLIB_ERR_NOMEM:
+            set_error( fci, FCIERR_ALLOC_FAIL, ERROR_OUTOFMEMORY );
+            return 0;
+        default:
+            set_error( fci, FCIERR_MCI_FAIL, ERROR_INTERNAL_ERROR );
+            return 0;
+        };
+    }
+
+    compressed_size = wimlib_compress(fci->data_in, fci->cdata_in, fci->data_out, sizeof(fci->data_out), fci->lzx_compressor);
+
+    return compressed_size;
+}
 
 /***********************************************************************
  *		FCICreate (CABINET.10)
@@ -1048,6 +1095,7 @@ HFCI __cdecl FCICreate(
   p_fci_internal->pv = pv;
   p_fci_internal->data.handle = -1;
   p_fci_internal->compress = compress_NONE;
+  p_fci_internal->compress_shutdown = shutdown_NONE;
 
   list_init( &p_fci_internal->folders_list );
   list_init( &p_fci_internal->files_list );
@@ -1411,19 +1459,38 @@ BOOL __cdecl FCIAddFile(
 
   if (typeCompress != p_fci_internal->compression)
   {
+      if ((typeCompress & tcompMASK_TYPE) == tcompTYPE_LZX) {
+          TCOMP window_size_bits = (typeCompress & tcompMASK_LZX_WINDOW);
+
+          if (window_size_bits < tcompLZX_WINDOW_LO || window_size_bits > tcompLZX_WINDOW_HI) {
+              set_error(p_fci_internal, FCIERR_BAD_COMPR_TYPE, ERROR_BAD_ARGUMENTS);
+              return FALSE;
+          }
+      }
+
       if (!FCIFlushFolder( hfci, pfnfcignc, pfnfcis )) return FALSE;
-      switch (typeCompress)
+
+      p_fci_internal->compress_shutdown(p_fci_internal);
+
+      switch (typeCompress & tcompMASK_TYPE)
       {
       case tcompTYPE_MSZIP:
-          p_fci_internal->compression = tcompTYPE_MSZIP;
-          p_fci_internal->compress    = compress_MSZIP;
+          p_fci_internal->compression       = tcompTYPE_MSZIP;
+          p_fci_internal->compress          = compress_MSZIP;
+          p_fci_internal->compress_shutdown = shutdown_MSZIP;
+          break;
+      case tcompTYPE_LZX:
+          p_fci_internal->compression       = typeCompress;
+          p_fci_internal->compress          = compress_LZX;
+          p_fci_internal->compress_shutdown = shutdown_LZX;
           break;
       default:
           FIXME( "compression %x not supported, defaulting to none\n", typeCompress );
           /* fall through */
       case tcompTYPE_NONE:
-          p_fci_internal->compression = tcompTYPE_NONE;
-          p_fci_internal->compress    = compress_NONE;
+          p_fci_internal->compression       = tcompTYPE_NONE;
+          p_fci_internal->compress          = compress_NONE;
+          p_fci_internal->compress_shutdown = shutdown_NONE;
           break;
       }
   }

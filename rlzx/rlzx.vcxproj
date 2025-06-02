@@ -142,6 +142,13 @@
     <ClCompile Include="..\wimlib\src\util.c" />
     <ClCompile Include="stubs.c" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\wimlib\include\wimlib.h" />
+    <ClInclude Include="..\wimlib\include\wimlib\lzx_common.h" />
+    <ClInclude Include="..\wimlib\include\wimlib\lzx_constants.h" />
+    <ClInclude Include="..\wimlib\include\wimlib\matchfinder_common.h" />
+    <ClInclude Include="..\wimlib\include\wimlib_tchar.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

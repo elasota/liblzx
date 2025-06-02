@@ -45,18 +45,27 @@ static void null_free_compressor(void *private)
 {
 }
 
+static int null_set_uint_property(
+	enum wimlib_compressor_uint_property property,
+	size_t value, void *private)
+{
+	return WIMLIB_ERR_INVALID_PARAM;
+}
+
 const struct compressor_ops lzms_compressor_ops = {
 
 	.get_needed_memory  = null_get_needed_memory,
 	.create_compressor  = null_create_compressor,
 	.compress			= null_compress,
 	.free_compressor    = null_free_compressor,
+	.set_uint_property  = null_set_uint_property,
 };
 
 const struct compressor_ops xpress_compressor_ops = {
 
-	.get_needed_memory = null_get_needed_memory,
-	.create_compressor = null_create_compressor,
-	.compress = null_compress,
-	.free_compressor = null_free_compressor,
+	.get_needed_memory	= null_get_needed_memory,
+	.create_compressor	= null_create_compressor,
+	.compress			= null_compress,
+	.free_compressor	= null_free_compressor,
+	.set_uint_property	= null_set_uint_property,
 };

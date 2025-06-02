@@ -114,7 +114,6 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -129,16 +128,12 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="minicab.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\rlzx\rlzx.vcxproj">
-      <Project>{aaf53ba5-e903-49aa-9de7-134846c59cd9}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\winecabinet\winecabinet.vcxproj">
       <Project>{291fe190-7098-49bc-b2ab-618584104e49}</Project>
     </ProjectReference>
