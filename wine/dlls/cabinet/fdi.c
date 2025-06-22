@@ -1785,6 +1785,11 @@ static int LZXfdi_decomp(int inlen, int outlen, fdi_decomp_state *decomp_state) 
       case LZX_BLOCKTYPE_ALIGNED:
         while (this_run > 0) {
           READ_HUFFSYM(MAINTREE, main_element);
+
+          if (window_posn == 0x22eb5)
+          {
+            int n = 0;
+          }
   
           if (main_element < LZX_NUM_CHARS) {
             /* literal: 0 to LZX_NUM_CHARS-1 */

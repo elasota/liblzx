@@ -50,5 +50,11 @@
     <ClInclude Include="..\wimlib\include\wimlib\matchfinder_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\wimlib\include\wimlib\bt_matchfinder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\wimlib\include\wimlib\hc_matchfinder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

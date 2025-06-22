@@ -1,0 +1,8 @@
+root = true
+
+[*.{c,h}]
+end_of_line=lf
+insert_final_newline=true
+charset=us-ascii
+indent_style=tab
+indent_size=8
