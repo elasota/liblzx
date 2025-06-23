@@ -17,8 +17,6 @@
 #include <algorithm>
 #include <limits>
 
-#include "wimlib.h"
-
 wchar_t *ConvertToUTF16(const char *path)
 {
 	int requiredSize = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, path, -1, nullptr, 0);
