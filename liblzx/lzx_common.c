@@ -172,37 +172,24 @@ lzx_e8_filter(u8 *data, u32 size, u32 chunk_offset, u32 e8_file_size,
 {
 
 #if !defined(__SSE2__) && !defined(__AVX2__)
-	/*
-	 * A worthwhile optimization is to push the end-of-buffer check into the
-	 * relatively rare E8 case.  This is possible if we replace the last six
-	 * bytes of data with E8 bytes; then we are guaranteed to hit an E8 byte
-	 * before reaching end-of-buffer.  In addition, this scheme guarantees
-	 * that no translation can begin following an E8 byte in the last 10
-	 * bytes because a 4-byte offset containing E8 as its high byte is a
-	 * large negative number that is not valid for translation.  That is
-	 * exactly what we need.
-	 */
 	u8 *tail;
-	u8 saved_bytes[6];
 	u8 *p;
 
 	if (size <= 10)
 		return;
 
-	tail = &data[size - 6];
-	memcpy(saved_bytes, tail, 6);
-	memset(tail, 0xE8, 6);
+	tail = &data[size - 10];
 	p = data;
-	for (;;) {
-		while (*p != 0xE8)
+	while (p < tail) {
+		if (*p != 0xE8) {
 			p++;
-		if (p >= tail)
-			break;
+			continue;
+		}
+
 		(*process_target)(p + 1, p - data + chunk_offset,
 				  e8_file_size);
 		p += 5;
 	}
-	memcpy(tail, saved_bytes, 6);
 #else
 	/* SSE2 or AVX-2 optimized version for x86_64  */
 
