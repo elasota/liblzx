@@ -186,6 +186,8 @@
 #include "util.h"
 #include "liblzx.h"
 
+#include <assert.h>
+
 /* Note: BT_MATCHFINDER_HASH2_ORDER must be defined before including
  * bt_matchfinder.h. */
 
@@ -209,8 +211,6 @@
 #undef mf_pos_t
 #undef MF_SUFFIX
 #undef MF_INVALID_POS
-
-#include "liblzx.h"
 
 /******************************************************************************/
 /*                            Compressor structure                            */
@@ -581,6 +581,9 @@ lzx_get_offset_slot(struct liblzx_compressor *c, u32 adjusted_offset,
 		return adjusted_offset;
 	if (is_16_bit || adjusted_offset < ARRAY_LEN(c->offset_slot_tab_1))
 		return c->offset_slot_tab_1[adjusted_offset];
+
+	assert((adjusted_offset >> 14) < ARRAY_LEN(c->offset_slot_tab_2));
+
 	return c->offset_slot_tab_2[adjusted_offset >> 14];
 }
 
@@ -2324,7 +2327,9 @@ lzx_compress_near_optimal(struct liblzx_compressor * restrict c,
 	struct lzx_lru_queue queue;
 
 	if (max_offset >= LZX_MAX_WINDOW_SIZE) {
-		max_offset = LZX_MAX_WINDOW_SIZE - 1;
+		/* Slightly shrink window to avoid offset values that are
+		 * greater than 21 bits. */
+		max_offset = LZX_MAX_WINDOW_SIZE - 1 - LZX_OFFSET_ADJUSTMENT;
 	}
 
 	in_begin -= c->in_prefix_size;
@@ -2752,7 +2757,9 @@ lzx_compress_lazy(struct liblzx_compressor * restrict c,
 	u32 next_hashes[2];
 
 	if (max_offset >= LZX_MAX_WINDOW_SIZE) {
-		max_offset = LZX_MAX_WINDOW_SIZE - 1;
+		/* Slightly shrink window to avoid offset values that are
+		 * greater than 21 bits. */
+		max_offset = LZX_MAX_WINDOW_SIZE - 1 - LZX_OFFSET_ADJUSTMENT;
 	}
 
 	in_begin -= c->in_prefix_size;
