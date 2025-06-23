@@ -438,29 +438,8 @@ TEMPLATED(bt_matchfinder_cull)(struct TEMPLATED(bt_matchfinder) * mf,
 			       u32 cull_size, u32 window_size)
 {
 	size_t mf_size = TEMPLATED(bt_matchfinder_size)(window_size, true);
-	void *mf2 = ((u8 *)mf) + mf_size;
 
 	const size_t mf_count = mf_size / sizeof(mf_pos_t);
 
-	TEMPLATED(matchfinder_rebase)((mf_pos_t *)mf2, mf_count, cull_size);
-}
-
-static attrib_forceinline void
-TEMPLATED(bt_matchfinder_save)(struct TEMPLATED(bt_matchfinder) * mf,
-			       u32 window_size)
-{
-	size_t mf_size = TEMPLATED(bt_matchfinder_size)(window_size, true);
-	void *mf2 = ((u8 *)mf) + mf_size;
-
-	memcpy(mf2, mf, mf_size);
-}
-
-static attrib_forceinline void
-TEMPLATED(bt_matchfinder_restore)(struct TEMPLATED(bt_matchfinder) * mf,
-				  u32 window_size)
-{
-	size_t mf_size = TEMPLATED(bt_matchfinder_size)(window_size, true);
-	const void *mf2 = ((const u8 *)mf) + mf_size;
-
-	memcpy(mf, mf2, mf_size);
+	TEMPLATED(matchfinder_rebase)((mf_pos_t *)mf, mf_count, cull_size);
 }

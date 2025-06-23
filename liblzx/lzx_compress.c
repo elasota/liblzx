@@ -2291,24 +2291,6 @@ lzx_reset_near_optimal_32(struct liblzx_compressor *c)
 }
 
 static attrib_forceinline void
-lzx_save_matchfinder_near_optimal(struct liblzx_compressor *restrict c,
-				  u32 next_hashes[2], bool is_16_bit)
-{
-	CALL_BT_MF(is_16_bit, c, bt_matchfinder_save, c->window_size);
-	c->next_hashes[0] = next_hashes[0];
-	c->next_hashes[1] = next_hashes[1];
-}
-
-static attrib_forceinline void
-lzx_restore_matchfinder_near_optimal(struct liblzx_compressor *restrict c,
-				     u32 next_hashes[2], bool is_16_bit)
-{
-	CALL_BT_MF(is_16_bit, c, bt_matchfinder_restore, c->window_size);
-	next_hashes[0] = c->next_hashes[0];
-	next_hashes[1] = c->next_hashes[1];
-}
-
-static attrib_forceinline void
 lzx_compress_near_optimal(struct liblzx_compressor * restrict c,
 			  const u8 *restrict in_begin,
 			  size_t in_nchunk, size_t in_ndata,
