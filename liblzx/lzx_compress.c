@@ -2795,12 +2795,6 @@ lzx_compress_lazy(struct liblzx_compressor * restrict c,
 		do {
 			unsigned dist = in_chunk_end - in_next;
 
-			if (dist <= 257)
-			{
-				// DELETE THIS
-				int n = 0;
-			}
-
 			/* Adjust max_len and nice_len if we're nearing the end
 			 * of the input buffer. */
 			if (unlikely(max_produce_len >
@@ -3302,7 +3296,10 @@ lzx_compress_chunk(struct liblzx_compressor *c)
 	if (c->in_prefix_size >= c->window_size * 2) {
 		u32 cull_amount = (c->in_prefix_size - c->window_size);
 
-		memmove(c->in_buffer, in - c->window_size, c->in_used);
+		in = (u8 *)c->in_buffer + c->in_prefix_size;
+
+		memmove(c->in_buffer, in - c->window_size,
+			c->in_used + c->window_size);
 		c->in_prefix_size = c->window_size;
 
 		(*c->cull)(c, cull_amount);

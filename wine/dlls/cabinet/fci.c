@@ -329,11 +329,6 @@ static BOOL add_data_blocks( FCI_Int *fci, BOOL is_last_block, PFNFCISTATUS stat
 
     if (fci->data.handle == -1 && !create_temp_file( fci, &fci->data )) return FALSE;
 
-    if (fci->cDataBlocksIn == 1681)
-    {
-        int n = 0;
-    }
-
     if (uncompressed_size)
     {
         compressed_size = fci->compress( fci );
