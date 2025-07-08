@@ -1,7 +1,8 @@
 /*
  * hc_matchfinder.h - Lempel-Ziv matchfinding with a hash table of linked lists
  *
- * Copyright 2022 Eric Biggers
+ * Copyright (C) 2025 Eric Lasota
+ * Based on wimlib.  Copyright 2022 Eric Biggers
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation

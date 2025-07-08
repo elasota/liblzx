@@ -1,7 +1,8 @@
 /*
  * endianness.h - macros and inline functions for endianness conversion
  *
- * Copyright 2022 Eric Biggers
+ * Copyright (C) 2025 Eric Lasota
+ * Based on wimlib.  Copyright 2022 Eric Biggers
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
