@@ -1041,7 +1041,7 @@ static cab_UWORD compress_LZX(FCI_Int *fci)
         props.lzx_variant = LIBLZX_VARIANT_CAB_DELTA;
         props.window_size = 1 << window_size_bits;
         props.chunk_granularity = CAB_BLOCKMAX;
-        props.compression_level = 0;
+        props.compression_level = 70;
         props.e8_file_size = LIBLZX_CONST_DEFAULT_E8_FILE_SIZE;
         props.alloc_func = compress_LZX_alloc_callback;
         props.free_func = compress_LZX_free_callback;
