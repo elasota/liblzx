@@ -154,7 +154,8 @@
  * unknown.  Ultimately, each token in LZX requires a whole number of bits to
  * output.
  */
-#define BIT_COST				64
+#define BIT_COST_BITS				6
+#define BIT_COST				(1 << BIT_COST_BITS)
 
 /*
  * Should the compressor take into account the costs of aligned offset symbols
@@ -1996,13 +1997,21 @@ lzx_compute_match_costs(struct liblzx_compressor *c)
 	}
 }
 
+typedef struct fixed32frac_s {
+	u32 value;
+} fixed32frac;
+
+typedef struct fixed32_s {
+	u64 value;
+} fixed32;
+
 /*
  * Fast approximation for log2f(x).  This is not as accurate as the standard C
  * version.  It does not need to be perfectly accurate because it is only used
  * for estimating symbol costs, which is very approximate anyway.
  */
-static float
-log2f_fast(float x)
+static s32
+log2f_fast_normalized(float x, int multiplier_bits)
 {
         union {
 		float f;
@@ -2026,8 +2035,233 @@ log2f_fast(float x)
 	 * The coefficients of the interpolating polynomial used here were found
 	 * using the script tools/log2_interpolation.r.
 	 */
-        return res - 1.653124006f + u.f * (1.9941812f - u.f * 0.3347490189f);
+        res = res - 1.653124006f + u.f * (1.9941812f - u.f * 0.3347490189f);
 
+	return res * (1 << multiplier_bits);
+}
+
+struct log2_fixed_table_pair
+{
+	u32 multiplier;
+	u32 log_add;
+};
+
+static const struct log2_fixed_table_pair log2_fixed_table_0[255] = {
+	{ 0xff01fc08u, 0x16f2dcfu },  { 0xfe05ee36u, 0x2dceffeu },
+	{ 0xfd0bd0beu, 0x4494959u },  { 0xfc139debu, 0x5b43ca6u },
+	{ 0xfb1d5020u, 0x71dcca2u },  { 0xfa28e1d4u, 0x885fc02u },
+	{ 0xf9364d94u, 0x9eccd73u },  { 0xf8458e02u, 0xb52439au },
+	{ 0xf7569dd6u, 0xcb66115u },  { 0xf66977dau, 0xe19287au },
+	{ 0xf57e16edu, 0xf7a9c58u },  { 0xf4947602u, 0x10dabf37u },
+	{ 0xf3ac901fu, 0x12399395u }, { 0xf2c6605bu, 0x13971beeu },
+	{ 0xf1e1e1e2u, 0x14f35ab3u }, { 0xf0ff0ff1u, 0x164e524fu },
+	{ 0xf01de5d7u, 0x17a80527u }, { 0xef3e5ef4u, 0x19007598u },
+	{ 0xee6076bau, 0x1a57a5f9u }, { 0xed8428aau, 0x1bad989cu },
+	{ 0xeca97059u, 0x1d024fc9u }, { 0xebd04968u, 0x1e55cdc7u },
+	{ 0xeaf8af8bu, 0x1fa814d2u }, { 0xea229e85u, 0x20f92722u },
+	{ 0xe94e1228u, 0x224906e7u }, { 0xe87b0655u, 0x2397b64fu },
+	{ 0xe7a976fdu, 0x24e5377du }, { 0xe6d9601du, 0x26318c93u },
+	{ 0xe60abdc3u, 0x277cb7acu }, { 0xe53d8c0bu, 0x28c6bad9u },
+	{ 0xe471c71du, 0x2a0f982cu }, { 0xe3a76b2fu, 0x2b5751aeu },
+	{ 0xe2de7486u, 0x2c9de963u }, { 0xe216df74u, 0x2de36147u },
+	{ 0xe150a854u, 0x2f27bb59u }, { 0xe08bcb94u, 0x306af989u },
+	{ 0xdfc845a9u, 0x31ad1dc8u }, { 0xdf061318u, 0x32ee29feu },
+	{ 0xde45306fu, 0x342e2014u }, { 0xdd859a4au, 0x356d01e8u },
+	{ 0xdcc74d51u, 0x36aad154u }, { 0xdc0a4635u, 0x37e79032u },
+	{ 0xdb4e81b5u, 0x39234051u }, { 0xda93fc99u, 0x3a5de380u },
+	{ 0xd9dab3b6u, 0x3b977b86u }, { 0xd922a3e9u, 0x3cd00a2au },
+	{ 0xd86bca1bu, 0x3e07912bu }, { 0xd7b62341u, 0x3f3e1241u },
+	{ 0xd701ac57u, 0x40738f27u }, { 0xd64e6266u, 0x41a8098eu },
+	{ 0xd59c427fu, 0x42db8323u }, { 0xd4eb49bcu, 0x440dfd94u },
+	{ 0xd43b7544u, 0x453f7a82u }, { 0xd38cc244u, 0x466ffb93u },
+	{ 0xd2df2df3u, 0x479f8265u }, { 0xd232b593u, 0x48ce108eu },
+	{ 0xd187566cu, 0x49fba7a9u }, { 0xd0dd0dd1u, 0x4b284946u },
+	{ 0xd033d91du, 0x4c53f6f4u }, { 0xcf8bb5b4u, 0x4d7eb23bu },
+	{ 0xcee4a102u, 0x4ea87ca4u }, { 0xce3e987au, 0x4fd157b4u },
+	{ 0xcd99999au, 0x50f944e7u }, { 0xccf5a1e5u, 0x522045bcu },
+	{ 0xcc52aee8u, 0x53465baau }, { 0xcbb0be38u, 0x546b8825u },
+	{ 0xcb0fcd6fu, 0x558fcca0u }, { 0xca6fda31u, 0x56b32a89u },
+	{ 0xc9d0e229u, 0x57d5a34au }, { 0xc932e309u, 0x58f7384au },
+	{ 0xc895da89u, 0x5a17eaf0u }, { 0xc7f9c66bu, 0x5b37bc99u },
+	{ 0xc75ea476u, 0x5c56aea2u }, { 0xc6c47277u, 0x5d74c26au },
+	{ 0xc62b2e44u, 0x5e91f945u }, { 0xc592d5b8u, 0x5fae5488u },
+	{ 0xc4fb66b5u, 0x60c9d584u }, { 0xc464df24u, 0x61e47d87u },
+	{ 0xc3cf3cf4u, 0x62fe4dddu }, { 0xc33a7e1au, 0x641747cdu },
+	{ 0xc2a6a091u, 0x652f6c9eu }, { 0xc213a25cu, 0x6646bd8fu },
+	{ 0xc1818182u, 0x675d3be2u }, { 0xc0f03c0fu, 0x6872e8d5u },
+	{ 0xc05fd018u, 0x6987c59fu }, { 0xbfd03bb5u, 0x6a9bd379u },
+	{ 0xbf417d06u, 0x6baf1395u }, { 0xbeb3922eu, 0x6cc18729u },
+	{ 0xbe267957u, 0x6dd32f61u }, { 0xbd9a30b1u, 0x6ee40d69u },
+	{ 0xbd0eb670u, 0x6ff4226du }, { 0xbc8408cdu, 0x71036f95u },
+	{ 0xbbfa2609u, 0x7211f601u }, { 0xbb710c66u, 0x731fb6d9u },
+	{ 0xbae8ba2fu, 0x742cb339u }, { 0xba612db0u, 0x7538ec41u },
+	{ 0xb9da653eu, 0x7644630au }, { 0xb9545f30u, 0x774f18adu },
+	{ 0xb8cf19e3u, 0x78590e41u }, { 0xb84a93b8u, 0x796244d9u },
+	{ 0xb7c6cb15u, 0x7a6abd86u }, { 0xb743be65u, 0x7b727958u },
+	{ 0xb6c16c17u, 0x7c79795bu }, { 0xb63fd29du, 0x7d7fbe9eu },
+	{ 0xb5bef071u, 0x7e854a23u }, { 0xb53ec40eu, 0x7f8a1cf4u },
+	{ 0xb4bf4bf5u, 0x808e3815u }, { 0xb44086aau, 0x81919c88u },
+	{ 0xb3c272b6u, 0x82944b4cu }, { 0xb3450ea6u, 0x83964560u },
+	{ 0xb2c8590bu, 0x84978bc0u }, { 0xb24c507au, 0x85981f63u },
+	{ 0xb1d0f38cu, 0x86980143u }, { 0xb15640ddu, 0x87973255u },
+	{ 0xb0dc370eu, 0x8895b38du }, { 0xb062d4c3u, 0x899385ddu },
+	{ 0xafea18a4u, 0x8a90aa35u }, { 0xaf72015du, 0x8b8d2181u },
+	{ 0xaefa8d9eu, 0x8c88ecadu }, { 0xae83bc18u, 0x8d840ca6u },
+	{ 0xae0d8b83u, 0x8e7e8252u }, { 0xad97fa99u, 0x8f784e96u },
+	{ 0xad230816u, 0x90717259u }, { 0xacaeb2bbu, 0x9169ee7eu },
+	{ 0xac3af94cu, 0x9261c3e6u }, { 0xabc7da92u, 0x9358f36cu },
+	{ 0xab555555u, 0x944f7df3u }, { 0xaae36865u, 0x95456453u },
+	{ 0xaa721292u, 0x963aa768u }, { 0xaa0152b0u, 0x972f4809u },
+	{ 0xa9912796u, 0x9823470fu }, { 0xa9219020u, 0x9916a54au },
+	{ 0xa8b28b29u, 0x9a096393u }, { 0xa8441792u, 0x9afb82bau },
+	{ 0xa7d6343fu, 0x9bed038du }, { 0xa768e015u, 0x9cdde6ddu },
+	{ 0xa6fc19fdu, 0x9dce2d77u }, { 0xa68fe0e4u, 0x9ebdd823u },
+	{ 0xa62433b8u, 0x9face7adu }, { 0xa5b91169u, 0xa09b5cdfu },
+	{ 0xa54e78edu, 0xa189387du }, { 0xa4e46939u, 0xa2767b4fu },
+	{ 0xa47ae148u, 0xa3632616u }, { 0xa411e014u, 0xa44f3999u },
+	{ 0xa3a9649eu, 0xa53ab692u }, { 0xa3416de5u, 0xa6259dc7u },
+	{ 0xa2d9faeeu, 0xa70feff2u }, { 0xa2730abfu, 0xa7f9add0u },
+	{ 0xa20c9c60u, 0xa8e2d81du }, { 0xa1a6aedcu, 0xa9cb6f95u },
+	{ 0xa1414141u, 0xaab374eeu }, { 0xa0dc529fu, 0xab9ae8dfu },
+	{ 0xa077e207u, 0xac81cc1fu }, { 0xa013ee8fu, 0xad681f62u },
+	{ 0x9fb0774du, 0xae4de35au }, { 0x9f4d7b5au, 0xaf3318bau },
+	{ 0x9eeaf9d1u, 0xb017c033u }, { 0x9e88f1d0u, 0xb0fbda74u },
+	{ 0x9e276276u, 0xb1df682bu }, { 0x9dc64ae5u, 0xb2c26a06u },
+	{ 0x9d65aa42u, 0xb3a4e0acu }, { 0x9d057fb2u, 0xb486cccbu },
+	{ 0x9ca5ca5du, 0xb5682f0cu }, { 0x9c46896du, 0xb6490816u },
+	{ 0x9be7bc0eu, 0xb7295893u }, { 0x9b896170u, 0xb8092121u },
+	{ 0x9b2b78c1u, 0xb8e8626cu }, { 0x9ace0134u, 0xb9c71d13u },
+	{ 0x9a70f9fdu, 0xbaa551b9u }, { 0x9a146253u, 0xbb8300fdu },
+	{ 0x99b8396cu, 0xbc602b82u }, { 0x995c7e82u, 0xbd3cd1e6u },
+	{ 0x990130d1u, 0xbe18f4c6u }, { 0x98a64f97u, 0xbef494bdu },
+	{ 0x984bda13u, 0xbfcfb267u }, { 0x97f1cf85u, 0xc0aa4e5fu },
+	{ 0x97982f30u, 0xc184693fu }, { 0x973ef859u, 0xc25e039eu },
+	{ 0x96e62a46u, 0xc3371e12u }, { 0x968dc43fu, 0xc40fb932u },
+	{ 0x9635c58du, 0xc4e7d594u }, { 0x95de2d7cu, 0xc5bf73cau },
+	{ 0x9586fb58u, 0xc696946au }, { 0x95302e70u, 0xc76d3803u },
+	{ 0x94d9c615u, 0xc8435f25u }, { 0x9483c197u, 0xc9190a64u },
+	{ 0x942e204au, 0xc9ee3a4eu }, { 0x93d8e182u, 0xcac2ef71u },
+	{ 0x93840497u, 0xcb972a58u }, { 0x932f88e0u, 0xcc6aeb90u },
+	{ 0x92db6db7u, 0xcd3e33a3u }, { 0x9287b275u, 0xce110320u },
+	{ 0x92345678u, 0xcee35a8du }, { 0x91e1591eu, 0xcfb53a70u },
+	{ 0x918eb9c5u, 0xd086a355u }, { 0x913c77ceu, 0xd15795c2u },
+	{ 0x90ea929bu, 0xd228123cu }, { 0x90990990u, 0xd2f81946u },
+	{ 0x9047dc12u, 0xd3c7ab65u }, { 0x8ff70986u, 0xd496c91du },
+	{ 0x8fa69154u, 0xd56572f1u }, { 0x8f5672e4u, 0xd633a963u },
+	{ 0x8f06ada2u, 0xd7016cf0u }, { 0x8eb740f9u, 0xd7cebe18u },
+	{ 0x8e682c54u, 0xd89b9d5fu }, { 0x8e196f23u, 0xd9680b3du },
+	{ 0x8dcb08d4u, 0xda340833u }, { 0x8d7cf8d8u, 0xdaff94bcu },
+	{ 0x8d2f3ea0u, 0xdbcab157u }, { 0x8ce1d9a0u, 0xdc955e7au },
+	{ 0x8c94c94cu, 0xdd5f9ca0u }, { 0x8c480d19u, 0xde296c45u },
+	{ 0x8bfba47eu, 0xdef2cddeu }, { 0x8baf8ef2u, 0xdfbbc1e5u },
+	{ 0x8b63cbeeu, 0xe08448d1u }, { 0x8b185aedu, 0xe14c6316u },
+	{ 0x8acd3b69u, 0xe214112du }, { 0x8a826cdeu, 0xe2db5389u },
+	{ 0x8a37eecau, 0xe3a22a9fu }, { 0x89edc0acu, 0xe46896deu },
+	{ 0x89a3e202u, 0xe52e98bfu }, { 0x895a524eu, 0xe5f430b0u },
+	{ 0x89111111u, 0xe6b95f22u }, { 0x88c81dceu, 0xe77e2486u },
+	{ 0x887f7808u, 0xe842814eu }, { 0x88371f45u, 0xe90675e5u },
+	{ 0x87ef130au, 0xe9ca02bcu }, { 0x87a752dfu, 0xea8d283du },
+	{ 0x875fde4au, 0xeb4fe6dau }, { 0x8718b4d4u, 0xec123effu },
+	{ 0x86d1d608u, 0xecd43114u }, { 0x868b4170u, 0xed95bd86u },
+	{ 0x8644f698u, 0xee56e4beu }, { 0x85fef50du, 0xef17a726u },
+	{ 0x85b93c5bu, 0xefd8052bu }, { 0x8573cc12u, 0xf097ff30u },
+	{ 0x852ea3c2u, 0xf157959cu }, { 0x84e9c2f9u, 0xf216c8ddu },
+	{ 0x84a5294au, 0xf2d59955u }, { 0x8460d647u, 0xf3940768u },
+	{ 0x841cc982u, 0xf4521381u }, { 0x83d90290u, 0xf50fbdffu },
+	{ 0x83958106u, 0xf5cd0747u }, { 0x83524478u, 0xf689efc0u },
+	{ 0x830f4c7eu, 0xf74677c9u }, { 0x82cc98afu, 0xf8029fc5u },
+	{ 0x828a28a2u, 0xf8be6819u }, { 0x8247fbf2u, 0xf979d120u },
+	{ 0x82061236u, 0xfa34db42u }, { 0x81c46b0bu, 0xfaef86d9u },
+	{ 0x8183060cu, 0xfba9d445u }, { 0x8141e2d4u, 0xfc63c3e8u },
+	{ 0x81010101u, 0xfd1d561du }, { 0x80c06030u, 0xfdd68b44u },
+	{ 0x80800000u, 0xfe8f63b9u },
+};
+
+static const u32 log2_fixed_table_1[255] = {
+	0x17152u,   0x2e2a3u,	0x453f2u,   0x5c540u,	0x7368du,   0x8a7d8u,
+	0xa1921u,   0xb8a69u,	0xcfbb0u,   0xe6cf6u,	0xfde39u,   0x114f7cu,
+	0x12c0bdu,  0x1431fcu,	0x15a33au,  0x171477u,	0x1885b2u,  0x19f6ecu,
+	0x1b6824u,  0x1cd95bu,	0x1e4a91u,  0x1fbbc5u,	0x212cf7u,  0x229e28u,
+	0x240f58u,  0x258086u,	0x26f1b3u,  0x2862deu,	0x29d408u,  0x2b4530u,
+	0x2cb657u,  0x2e277du,	0x2f98a1u,  0x3109c4u,	0x327ae5u,  0x33ec05u,
+	0x355d23u,  0x36ce40u,	0x383f5bu,  0x39b077u,	0x3b218fu,  0x3c92a6u,
+	0x3e03bcu,  0x3f74d0u,	0x40e5e3u,  0x4256f4u,	0x43c804u,  0x453912u,
+	0x46aa1fu,  0x481b2bu,	0x498c36u,  0x4afd3fu,	0x4c6e46u,  0x4ddf4cu,
+	0x4f5050u,  0x50c153u,	0x523254u,  0x53a355u,	0x551454u,  0x568551u,
+	0x57f64cu,  0x596747u,	0x5ad83fu,  0x5c4938u,	0x5dba2eu,  0x5f2b22u,
+	0x609c15u,  0x620d06u,	0x637df8u,  0x64eee6u,	0x665fd3u,  0x67d0bfu,
+	0x6941abu,  0x6ab293u,	0x6c237bu,  0x6d9461u,	0x6f0546u,  0x707629u,
+	0x71e70bu,  0x7357ecu,	0x74c8cbu,  0x7639a8u,	0x77aa84u,  0x791b5fu,
+	0x7a8c38u,  0x7bfd10u,	0x7d6de7u,  0x7edebbu,	0x804f8eu,  0x81c061u,
+	0x833131u,  0x84a202u,	0x8612cfu,  0x87839au,	0x88f466u,  0x8a652fu,
+	0x8bd5f8u,  0x8d46beu,	0x8eb784u,  0x902847u,	0x91990au,  0x9309cau,
+	0x947a89u,  0x95eb47u,	0x975c03u,  0x98ccbfu,	0x9a3d79u,  0x9bae31u,
+	0x9d1ee8u,  0x9e8f9cu,	0xa00051u,  0xa17103u,	0xa2e1b4u,  0xa45263u,
+	0xa5c312u,  0xa733bfu,	0xa8a469u,  0xaa1513u,	0xab85bcu,  0xacf662u,
+	0xae6708u,  0xafd7adu,	0xb1484eu,  0xb2b8f0u,	0xb42990u,  0xb59a2du,
+	0xb70acbu,  0xb87b67u,	0xb9ec01u,  0xbb5c98u,	0xbccd30u,  0xbe3dc6u,
+	0xbfae5au,  0xc11eedu,	0xc28f7fu,  0xc4000eu,	0xc5709cu,  0xc6e12au,
+	0xc851b5u,  0xc9c240u,	0xcb32c9u,  0xcca350u,	0xce13d6u,  0xcf845bu,
+	0xd0f4deu,  0xd2655fu,	0xd3d5dfu,  0xd5465eu,	0xd6b6dbu,  0xd82757u,
+	0xd997d2u,  0xdb084au,	0xdc78c2u,  0xdde938u,	0xdf59acu,  0xe0ca1fu,
+	0xe23a91u,  0xe3ab01u,	0xe51b70u,  0xe68bdfu,	0xe7fc4au,  0xe96cb5u,
+	0xeadd1du,  0xec4d85u,	0xedbdecu,  0xef2e51u,	0xf09eb4u,  0xf20f17u,
+	0xf37f77u,  0xf4efd6u,	0xf66033u,  0xf7d090u,	0xf940eau,  0xfab144u,
+	0xfc219cu,  0xfd91f2u,	0xff0248u,  0x100729bu, 0x101e2eeu, 0x103533eu,
+	0x104c38eu, 0x10633dbu, 0x107a428u, 0x1091472u, 0x10a84bdu, 0x10bf504u,
+	0x10d654bu, 0x10ed591u, 0x11045d4u, 0x111b617u, 0x1132658u, 0x1149697u,
+	0x11606d6u, 0x1177713u, 0x118e74du, 0x11a5787u, 0x11bc7c0u, 0x11d37f7u,
+	0x11ea82du, 0x1201860u, 0x1218892u, 0x122f8c4u, 0x12468f4u, 0x125d922u,
+	0x127494fu, 0x128b97bu, 0x12a29a5u, 0x12b99ceu, 0x12d09f5u, 0x12e7a1bu,
+	0x12fea3fu, 0x1315a62u, 0x132ca83u, 0x1343aa3u, 0x135aac1u, 0x1371adeu,
+	0x1388afau, 0x139fb15u, 0x13b6b2eu, 0x13cdb45u, 0x13e4b5bu, 0x13fbb6fu,
+	0x1412b83u, 0x1429b94u, 0x1440ba4u, 0x1457bb4u, 0x146ebc1u, 0x1485bccu,
+	0x149cbd8u, 0x14b3be0u, 0x14cabe8u, 0x14e1beeu, 0x14f8bf2u, 0x150fbf6u,
+	0x1526bf9u, 0x153dbf9u, 0x1554bf8u, 0x156bbf5u, 0x1582bf2u, 0x1599becu,
+	0x15b0be6u, 0x15c7bdeu, 0x15debd3u, 0x15f5bc9u, 0x160cbbdu, 0x1623bafu,
+	0x163ab9fu, 0x1651b8eu, 0x1668b7du, 0x167fb69u, 0x1696b54u, 0x16adb3eu,
+	0x16c4b26u, 0x16dbb0du, 0x16f2af3u,
+};
+
+static s32
+log2_fixed_fast_normalized(const fixed32 *value, int multiplier_bits)
+{
+	s32 base_pos = 0;
+	u32 mantissa = 0;
+	u32 mantissa_log2 = 0;
+	u8 mantissa_byte = 0;
+	s64 final_log = 0;
+
+	if (value->value == 0)
+		return 0;
+
+	base_pos = (int)bsr64(value->value) - 32;
+	if (base_pos > 0) {
+		mantissa = (value->value >> base_pos) & 0xffffffffu;
+	} else {
+		mantissa = (value->value << -base_pos) & 0xffffffffu;
+	}
+
+	/* Get the first byte */
+	mantissa_byte = (mantissa >> 24) & 0xffu;
+
+	if (mantissa_byte != 0) {
+		const struct log2_fixed_table_pair *pair = log2_fixed_table_0 + (mantissa_byte - 1);
+		mantissa = (u32)((mantissa * (u64)pair->multiplier) >> 32) + pair->multiplier;
+
+		mantissa_log2 += pair->log_add;
+	}
+
+	mantissa_byte = (mantissa >> 16) & 0xffu;
+
+	if (mantissa_byte != 0) {
+		mantissa_log2 += log2_fixed_table_1[mantissa_byte - 1];
+	}
+
+	final_log = (s64)mantissa_log2 + ((s64)base_pos << 32);
+	final_log /= ((s64)1 << (32 - multiplier_bits));
+
+	return (s32)final_log;
 }
 
 /*
@@ -2035,7 +2269,7 @@ log2f_fast(float x)
  * given probability.
  */
 static u32
-lzx_cost_for_probability(float prob)
+lzx_cost_for_probability(const fixed32* prob)
 {
 	/*
 	 * The basic formula is:
@@ -2053,7 +2287,7 @@ lzx_cost_for_probability(float prob)
 	 * we cannot, in general, assume the computed cost is non-negative, and
 	 * we should make sure negative costs get rounded up correctly.
 	 */
-	s32 cost = -log2f_fast(prob) * BIT_COST;
+	s32 cost = -log2_fixed_fast_normalized(prob, BIT_COST_BITS);
 	return max_signed(cost, BIT_COST);
 }
 
@@ -2108,6 +2342,67 @@ static const u16 lzx_default_len_costs[LZX_LENCODE_NUM_SYMBOLS] = {
 	762, 764, 764, 754, 763, 764, 763, 763, 762, 763, 584,
 };
 
+static void
+fixed_rcp_approx(fixed32frac *result, u32 i)
+{
+	result->value = ((u64)0x100000000ull) / i;
+}
+
+static void
+fixed_set(fixed32 *result, u32 i)
+{
+	result->value = ((u64)i << 32);
+}
+
+static void
+fixed_set_fraction(fixed32frac *result, u32 num, u32 denom)
+{
+	result->value = (((u64)num) << 32) / denom;
+}
+
+static void
+fixed_mul(fixed32 *result, const fixed32 *a, const fixed32 *b)
+{
+}
+
+static void
+fixed_mul_uint_frac(fixed32 *result, u32 a, const fixed32frac *b)
+{
+	result->value = ((u64)a) * (u64)b->value;
+}
+
+static void
+fixed_mul_uint_frac_to_frac(fixed32frac *result, u32 a, const fixed32frac *b)
+{
+	fixed32 fixed;
+	fixed_mul_uint_frac(&fixed, a, b);
+	result->value = (u32)fixed.value;
+}
+
+static void
+fixed_add_frac(fixed32 *result, const fixed32 *a, const fixed32frac *b)
+{
+	result->value = a->value + b->value;
+}
+
+static void
+fixed_sub(fixed32 *result, const fixed32 *a, const fixed32 *b)
+{
+	result->value = a->value + b->value;
+}
+
+static void
+fixed_max_frac(fixed32 *result, const fixed32 *a, const fixed32frac *b)
+{
+	result->value = max_unsigned(a->value, b->value);
+}
+
+static void
+fixed_div_uint(fixed32 *result, const fixed32 *a, u32 b)
+{
+	result->value = a->value / b;
+}
+
 /* Set default costs to bootstrap the iterative optimization algorithm. */
 static void
 lzx_set_default_costs(struct liblzx_compressor *c)
@@ -2115,11 +2410,19 @@ lzx_set_default_costs(struct liblzx_compressor *c)
 	unsigned i;
 	u32 num_literals = 0;
 	u32 num_used_literals = 0;
-	float inv_num_matches = 1.0f / c->freqs.main[LZX_NUM_CHARS];
-	float inv_num_items;
-	float prob_match = 1.0f;
+	fixed32frac inv_num_matches;
+	fixed32frac half_inv_num_items;
+	fixed32frac half_inv_6870;
+	fixed32 prob_match;
+	fixed32frac frac_15_100;
 	u32 match_cost;
-	float base_literal_prob;
+	fixed32frac half_base_literal_prob;
+	fixed32 temp_fixed;
+
+	fixed_rcp_approx(&inv_num_matches, c->freqs.main[LZX_NUM_CHARS]);
+	fixed_rcp_approx(&half_inv_6870, 6870 * 2);
+	fixed_set(&prob_match, 1);
+	fixed_set_fraction(&frac_15_100, 15, 100);
 
 	/* Some numbers here have been hardcoded to assume a bit cost of 64. */
 	STATIC_ASSERT(BIT_COST == 64);
@@ -2135,19 +2438,23 @@ lzx_set_default_costs(struct liblzx_compressor *c)
 	/* Note: all match headers were tallied as symbol 'LZX_NUM_CHARS'.  We
 	 * don't attempt to estimate which ones will be used. */
 
-	inv_num_items = 1.0f / (num_literals + c->freqs.main[LZX_NUM_CHARS]);
-	base_literal_prob = literal_scaled_probs[num_used_literals] *
-			    (1.0f / 6870.0f);
+	fixed_rcp_approx(&half_inv_num_items,
+			 (num_literals + c->freqs.main[LZX_NUM_CHARS]) * 2);
+	fixed_mul_uint_frac_to_frac(&half_base_literal_prob,
+			    literal_scaled_probs[num_used_literals],
+			    &half_inv_6870);
 
 	/* Literal costs.  We use two different methods to compute the
 	 * probability of each literal and mix together their results. */
 	for (i = 0; i < LZX_NUM_CHARS; i++) {
 		u32 freq = c->freqs.main[i];
 		if (freq != 0) {
-			float prob = 0.5f * ((freq * inv_num_items) +
-					     base_literal_prob);
-			c->costs.main[i] = lzx_cost_for_probability(prob);
-			prob_match -= prob;
+			fixed32 prob;
+			fixed_mul_uint_frac(&prob, freq, &half_inv_num_items);
+			fixed_add_frac(&prob, &prob, &half_base_literal_prob);
+
+			c->costs.main[i] = lzx_cost_for_probability(&prob);
+			fixed_sub(&prob_match, &prob_match, &prob);
 		} else {
 			c->costs.main[i] = 11 * BIT_COST;
 		}
@@ -2157,9 +2464,10 @@ lzx_set_default_costs(struct liblzx_compressor *c)
 	 * equally probable, but we do take into account the relative cost of a
 	 * match header vs. a literal depending on how common matches are
 	 * expected to be vs. literals. */
-	prob_match = max_float(prob_match, 0.15f);
-	match_cost = lzx_cost_for_probability(prob_match / (c->num_main_syms -
-							    LZX_NUM_CHARS));
+	fixed_max_frac(&prob_match, &prob_match, &frac_15_100);
+	fixed_div_uint(&temp_fixed, &prob_match,
+		       (c->num_main_syms - LZX_NUM_CHARS));
+	match_cost = lzx_cost_for_probability(&temp_fixed);
 	for (; i < c->num_main_syms; i++)
 		c->costs.main[i] = match_cost;
 
@@ -2179,8 +2487,10 @@ lzx_set_default_costs(struct liblzx_compressor *c)
 		 * addition for every match. */
 		unsigned j = (i - LZX_OFFSET_ADJUSTMENT) & LZX_ALIGNED_OFFSET_BITMASK;
 		if (c->freqs.aligned[j] != 0) {
-			float prob = c->freqs.aligned[j] * inv_num_matches;
-			c->costs.aligned[i] = lzx_cost_for_probability(prob);
+			fixed32 prob;
+			fixed_mul_uint_frac(&prob, c->freqs.aligned[j],
+					    &inv_num_matches);
+			c->costs.aligned[i] = lzx_cost_for_probability(&prob);
 		} else {
 			c->costs.aligned[i] =
 				(2 * LZX_NUM_ALIGNED_OFFSET_BITS) * BIT_COST;
