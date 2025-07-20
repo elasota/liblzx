@@ -290,7 +290,7 @@ TEMPLATED(bt_matchfinder_advance_one_byte)(struct TEMPLATED(bt_matchfinder) * co
 			if (!record_matches || len > best_len) {
 				if (record_matches) {
 					best_len = len;
-					lz_matchptr->length = min_unsigned(len, max_produce_len);
+					lz_matchptr->length = min_u32(len, max_produce_len);
 					lz_matchptr->offset =
 						in_next - matchptr;
 					lz_matchptr++;

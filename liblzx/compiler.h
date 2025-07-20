@@ -33,6 +33,8 @@
 
 #ifdef _MSC_VER
 #include <stdint.h>
+
+#pragma warning(error:4013)
 #endif
 
 #ifndef __ORDER_LITTLE_ENDIAN__
@@ -159,61 +161,6 @@
 #else
 #  define UNALIGNED_ACCESS_IS_FAST 0
 #endif
-
-/* Get the minimum of two variables, without multiple evaluation.  */
-static attrib_forceinline double
-min_float(double a, double b)
-{
-	return (a < b) ? a : b;
-}
-
-static attrib_forceinline uintmax_t
-min_unsigned(uintmax_t a, uintmax_t b)
-{
-	return (a < b) ? a : b;
-}
-
-static attrib_forceinline intmax_t
-min_signed(intmax_t a, intmax_t b)
-{
-	return (a < b) ? a : b;
-}
-
-static attrib_forceinline void *
-min_ptr(void *a, void *b)
-{
-	return (a < b) ? a : b;
-}
-
-/* Get the maximum of two variables, without multiple evaluation.  */
-static attrib_forceinline double
-max_float(double a, double b)
-{
-	return (a > b) ? a : b;
-}
-
-static attrib_forceinline uintmax_t
-max_unsigned(uintmax_t a, uintmax_t b)
-{
-	return (a > b) ? a : b;
-}
-
-static attrib_forceinline intmax_t
-max_signed(intmax_t a, intmax_t b)
-{
-	return (a > b) ? a : b;
-}
-
-static attrib_forceinline void *
-max_ptr(void *a, void *b)
-{
-	return (a > b) ? a : b;
-}
-
-/* Get the maximum of three variables, without multiple evaluation.  */
-#define max3_signed(a, b, c)	max_signed(max_signed((a), (b)), (c))
-#define max3_unsigned(a, b, c)	max_unsigned(max_unsigned((a), (b)), (c))
-#define max3_float(a, b, c)	max_float(max_float((a), (b)), (c))
 
 /* Swap the values of two variables, without multiple evaluation.  */
 #ifndef swap

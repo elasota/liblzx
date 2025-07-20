@@ -184,6 +184,7 @@
 #include "compressor_ops.h"
 #include "error.h"
 #include "lzx_common.h"
+#include "minmax.h"
 #include "unaligned.h"
 #include "util.h"
 #include "liblzx.h"
@@ -833,7 +834,8 @@ lzx_compute_precode_items(const u8 * restrict lens,
 
 			/* Symbol 18: RLE 20 to 51 zeroes at a time.  */
 			while ((run_end - run_start) >= 20) {
-				extra_bits = min_unsigned((run_end - run_start) - 20, 0x1F);
+				extra_bits =
+				    min_uint((run_end - run_start) - 20, 0x1F);
 				precode_freqs[18]++;
 				*itemptr++ = 18 | (extra_bits << 5);
 				run_start += 20 + extra_bits;
@@ -841,7 +843,8 @@ lzx_compute_precode_items(const u8 * restrict lens,
 
 			/* Symbol 17: RLE 4 to 19 zeroes at a time.  */
 			if ((run_end - run_start) >= 4) {
-				extra_bits = min_unsigned((run_end - run_start) - 4, 0xF);
+				extra_bits =
+				    min_uint((run_end - run_start) - 4, 0xF);
 				precode_freqs[17]++;
 				*itemptr++ = 17 | (extra_bits << 5);
 				run_start += 4 + extra_bits;
@@ -1747,7 +1750,8 @@ lzx_find_min_cost_path(struct liblzx_compressor * const restrict c,
 		if (num_matches) {
 			struct lz_match *end_matches = cache_ptr + num_matches;
 			unsigned next_len = LZX_MIN_MATCH_LEN;
-			unsigned max_len = min_unsigned(block_end - in_next, LZX_MAX_MATCH_LEN);
+			unsigned max_len =
+			    min_uint(block_end - in_next, LZX_MAX_MATCH_LEN);
 			const u8 *matchptr;
 
 			/* Consider rep0 matches. */
@@ -1864,8 +1868,8 @@ lzx_find_min_cost_path(struct liblzx_compressor * const restrict c,
 						if (load_u16_unaligned(strptr) == load_u16_unaligned(matchptr)) {
 							STATIC_ASSERT(ARRAY_LEN(queues) - LZX_MAX_MATCH_LEN - 2 >= 250);
 							STATIC_ASSERT(ARRAY_LEN(queues) == ARRAY_LEN(matches_before_gap));
-							unsigned limit = min_unsigned(remaining,
-									     min_unsigned(ARRAY_LEN(queues) - LZX_MAX_MATCH_LEN - 2,
+							unsigned limit = min_uint(remaining,
+									     min_uint(ARRAY_LEN(queues) - LZX_MAX_MATCH_LEN - 2,
 										 LZX_MAX_MATCH_LEN));
 							unsigned rep0_len = lz_extend(strptr, matchptr, 2, limit);
 							u8 lit = strptr[-1];
@@ -2288,7 +2292,7 @@ lzx_cost_for_probability(const fixed32* prob)
 	 * we should make sure negative costs get rounded up correctly.
 	 */
 	s32 cost = -log2_fixed_fast_normalized(prob, BIT_COST_BITS);
-	return max_signed(cost, BIT_COST);
+	return max_u32(cost, BIT_COST);
 }
 
 /*
@@ -2394,7 +2398,7 @@ fixed_sub(fixed32 *result, const fixed32 *a, const fixed32 *b)
 static void
 fixed_max_frac(fixed32 *result, const fixed32 *a, const fixed32frac *b)
 {
-	result->value = max_unsigned(a->value, b->value);
+	result->value = max_u64(a->value, b->value);
 }
 
 static void
@@ -2615,7 +2619,7 @@ lzx_compress_near_optimal(struct liblzx_compressor * restrict c,
 	const u8 * const in_data_end = in_begin + in_ndata;
 	u32 max_find_len = LZX_MAX_MATCH_LEN;
 	u32 max_produce_len = LZX_MAX_MATCH_LEN;
-	u32 nice_len = min_unsigned(c->nice_match_length, max_find_len);
+	u32 nice_len = min_u32(c->nice_match_length, max_find_len);
 	u32 next_hashes[2] = {0, 0};
 	struct lzx_lru_queue queue;
 
@@ -2639,14 +2643,14 @@ lzx_compress_near_optimal(struct liblzx_compressor * restrict c,
 
 		const u8 * const in_block_begin = in_next;
 		const u8 * const in_max_block_end =
-			in_next + min_unsigned(SOFT_MAX_BLOCK_SIZE, in_chunk_end - in_next);
+			in_next + min_size(SOFT_MAX_BLOCK_SIZE, in_chunk_end - in_next);
 		struct lz_match *cache_ptr = c->match_cache;
 		const u8 *next_search_pos = in_next;
 		const u8 *next_observation = in_next;
 		const u8 *next_pause_point =
-			min_ptr(in_next + min_unsigned(MIN_BLOCK_SIZE,
+			min_constptr(in_next + min_size(MIN_BLOCK_SIZE,
 					  in_max_block_end - in_next),
-			    in_max_block_end - min_unsigned(LZX_MAX_MATCH_LEN - 1,
+		    in_max_block_end - min_size(LZX_MAX_MATCH_LEN - 1,
 						   in_max_block_end - in_next));
 
 		lzx_init_block_split_stats(&c->split_stats);
@@ -2668,7 +2672,7 @@ lzx_compress_near_optimal(struct liblzx_compressor * restrict c,
 		do {
 			size_t min_match_pos = in_next - in_begin;
 			min_match_pos -=
-			    min_unsigned(min_match_pos, max_offset);
+			    min_size(min_match_pos, max_offset);
 
 			if (in_next >= next_search_pos &&
 				likely(nice_len >= LZX_MIN_MATCH_LEN)) {
@@ -2764,7 +2768,7 @@ lzx_compress_near_optimal(struct liblzx_compressor * restrict c,
 		if (unlikely(max_produce_len > in_data_end - in_next)) {
 			max_produce_len = in_chunk_end - in_next;
 			max_find_len = in_data_end - in_next;
-			nice_len = min_unsigned(max_produce_len, nice_len);
+			nice_len = min_u32(max_produce_len, nice_len);
 			if (max_find_len < BT_MATCHFINDER_REQUIRED_NBYTES) {
 				while (in_next != in_chunk_end) {
 					cache_ptr->length = 0;
@@ -2793,10 +2797,10 @@ lzx_compress_near_optimal(struct liblzx_compressor * restrict c,
 		/* It's not time to end the block yet.  Compute the next pause
 		 * point and resume matchfinding. */
 		next_pause_point =
-			min_ptr(in_next + min_unsigned(NUM_OBSERVATIONS_PER_BLOCK_CHECK * 2 -
+			min_ptr(in_next + min_size(NUM_OBSERVATIONS_PER_BLOCK_CHECK * 2 -
 					    c->split_stats.num_new_observations,
 					  in_max_block_end - in_next),
-			    in_max_block_end - min_unsigned(LZX_MAX_MATCH_LEN - 1,
+			    in_max_block_end - min_size(LZX_MAX_MATCH_LEN - 1,
 						   in_max_block_end - in_next));
 		goto resume_matchfinding;
 
@@ -3044,7 +3048,7 @@ lzx_compress_lazy(struct liblzx_compressor * restrict c,
 	const u8 *const in_data_end = in_begin + in_ndata;
 	unsigned max_find_len = LZX_MAX_MATCH_LEN;
 	unsigned max_produce_len = LZX_MAX_MATCH_LEN;
-	unsigned nice_len = min_unsigned(c->nice_match_length, max_find_len);
+	unsigned nice_len = min_uint(c->nice_match_length, max_find_len);
 	STATIC_ASSERT(LZX_NUM_RECENT_OFFSETS == 3);
 	u32 recent_offsets[LZX_NUM_RECENT_OFFSETS];
 	u32 next_hashes[2];
@@ -3073,7 +3077,7 @@ lzx_compress_lazy(struct liblzx_compressor * restrict c,
 
 		const u8 * const in_block_begin = in_next;
 		const u8 * const in_max_block_end =
-			in_next + min_unsigned(SOFT_MAX_BLOCK_SIZE, in_chunk_end - in_next);
+			in_next + min_size(SOFT_MAX_BLOCK_SIZE, in_chunk_end - in_next);
 		struct lzx_sequence *next_seq = c->chosen_sequences;
 		u32 litrunlen = 0;
 		unsigned cur_len;
@@ -3102,7 +3106,7 @@ lzx_compress_lazy(struct liblzx_compressor * restrict c,
 				max_produce_len = in_chunk_end - in_next;
 				max_find_len = in_data_end - in_next;
 				nice_len =
-				    min_unsigned(max_produce_len, nice_len);
+				    min_uint(max_produce_len, nice_len);
 			}
 
 			/* Find the longest match (subject to the
@@ -3112,7 +3116,7 @@ lzx_compress_lazy(struct liblzx_compressor * restrict c,
 			{
 				size_t min_match_pos = in_next - in_begin;
 				min_match_pos -=
-				    min_unsigned(min_match_pos, max_offset);
+				    min_size(min_match_pos, max_offset);
 
 				cur_len = CALL_HC_MF(is_16_bit, c,
 						     hc_matchfinder_longest_match,
@@ -3194,13 +3198,13 @@ lzx_compress_lazy(struct liblzx_compressor * restrict c,
 				max_produce_len = in_chunk_end - in_next;
 				max_find_len = in_data_end - in_next;
 				nice_len =
-				    min_unsigned(max_produce_len, nice_len);
+				    min_uint(max_produce_len, nice_len);
 			}
 
 			{
 				size_t min_match_pos = in_next - in_begin;
 				min_match_pos -=
-				    min_unsigned(min_match_pos, max_offset);
+				    min_uint(min_match_pos, max_offset);
 
 				next_len = CALL_HC_MF(
 						      is_16_bit, c,
@@ -3511,7 +3515,7 @@ liblzx_compress_create(const struct liblzx_compress_properties *props)
 		/* lzx_compress_lazy() needs max_search_depth >= 2 because it
 		 * halves the max_search_depth when attempting a lazy match, and
 		 * max_search_depth must be at least 1. */
-		c->max_search_depth = max_unsigned(c->max_search_depth, 2);
+		c->max_search_depth = max_uint(c->max_search_depth, 2);
 	} else {
 
 		/* Normal / high compression: Use near-optimal parsing. */
@@ -3542,7 +3546,7 @@ liblzx_compress_create(const struct liblzx_compress_properties *props)
 		c->num_optim_passes += (props->compression_level >= 300);
 
 		/* max_search_depth must be at least 1. */
-		c->max_search_depth = max_unsigned(c->max_search_depth, 1);
+		c->max_search_depth = max_uint(c->max_search_depth, 1);
 	}
 
 	/* Prepare the offset => offset slot mapping. */
@@ -3567,7 +3571,7 @@ lzx_compress_chunk(struct liblzx_compressor *c)
 	struct lzx_output_bitstream os;
 	size_t result;
 	bool e8_preprocess_enabled = (c->e8_chunk_offset < 0x40000000);
-	u32 chunk_size = min_unsigned(c->chunk_size, c->in_used);
+	u32 chunk_size = min_u32(c->chunk_size, c->in_used);
 
 	u8 *in = (u8 *)c->in_buffer + c->in_prefix_size;
 
@@ -3631,9 +3635,9 @@ liblzx_compress_add_input(liblzx_compressor_t *c, const void *in_data,
 	if (c->out_chunk.size > 0 || c->flushing)
 		return 0;
 
-	max_used = min_unsigned(c->in_buffer_capacity - c->in_prefix_size,
+	max_used = min_uint(c->in_buffer_capacity - c->in_prefix_size,
 				c->chunk_size + LZX_MAX_MATCH_LEN);
-	fill_amount = min_unsigned(in_data_size, max_used - c->in_used);
+	fill_amount = min_size(in_data_size, max_used - c->in_used);
 
 	memcpy(((u8 *)c->in_buffer) + c->in_prefix_size + c->in_used, in_data,
 	       fill_amount);

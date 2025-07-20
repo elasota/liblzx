@@ -355,7 +355,7 @@ TEMPLATED(hc_matchfinder_longest_match)(struct TEMPLATED(hc_matchfinder) * const
 	}
 out:
 	*offset_ret = in_next - best_matchptr;
-	best_len = min_unsigned(best_len, max_produce_len);
+	best_len = min_u32(best_len, max_produce_len);
 	if (best_len < 2)
 		best_len = 2;
 

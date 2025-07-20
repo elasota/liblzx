@@ -24,6 +24,8 @@
 #  include "config.h"
 #endif
 
+#include "minmax.h"
+
 #include <string.h>
 
 #ifdef __SSE2__
@@ -80,7 +82,7 @@ lzx_get_window_order(size_t max_bufsize)
 	if (max_bufsize == 0 || max_bufsize > LZX_MAX_WINDOW_SIZE)
 		return 0;
 
-	return max_unsigned(ilog2_ceil(max_bufsize), LZX_MIN_WINDOW_ORDER);
+	return max_uint(ilog2_ceil(max_bufsize), LZX_MIN_WINDOW_ORDER);
 }
 
 /* Given a valid LZX window order, return the number of symbols that will exist
@@ -187,7 +189,7 @@ lzx_e8_filter(u8 *data, u32 size, u32 chunk_offset, u32 e8_file_size,
 			continue;
 		}
 
-		(*process_target)(p + 1, p - data + chunk_offset,
+		(*process_target)(p + 1, (s32)(p - data + chunk_offset),
 				  e8_file_size);
 		p += 5;
 	}
