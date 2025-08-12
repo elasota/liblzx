@@ -143,7 +143,6 @@
     <ClInclude Include="types.h" />
     <ClInclude Include="unaligned.h" />
     <ClInclude Include="util.h" />
-    <ClInclude Include="wimlib_tchar.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="compress_common.c" />

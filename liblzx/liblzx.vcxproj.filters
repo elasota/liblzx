@@ -60,9 +60,6 @@
     <ClInclude Include="util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="wimlib_tchar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="matchfinder_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>

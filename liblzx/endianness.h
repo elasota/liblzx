@@ -32,6 +32,10 @@
 #include "compiler.h"
 #include "types.h"
 
+#ifdef _MSC_VER
+#include <intrin.h>
+#endif
+
 #ifdef HAVE_SYS_ENDIAN_H
    /* Needed on NetBSD to stop system bswap macros from messing things up */
 #  include <sys/endian.h>

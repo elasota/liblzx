@@ -5,7 +5,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "wimlib_tchar.h"
 #include "compiler.h"
 
 #ifndef _NTFS_TYPES_H

@@ -54,9 +54,6 @@ mempcpy(void *dst, const void *src, size_t n);
 void
 get_random_bytes(void *p, size_t n);
 
-void
-get_random_alnum_chars(tchar *p, size_t n);
-
 /************************
  * Hashing and comparison
  ************************/
