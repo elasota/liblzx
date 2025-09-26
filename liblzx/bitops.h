@@ -46,11 +46,11 @@ static attrib_forceinline unsigned
 bsr32(uint32_t v)
 {
 #ifdef _MSC_VER
-	unsigned long result;
-	_BitScanReverse(&result, v);
-	return result;
+        unsigned long result;
+        _BitScanReverse(&result, v);
+        return result;
 #else
-	return 31 - __builtin_clz(v);
+        return 31 - __builtin_clz(v);
 #endif
 }
 
@@ -59,31 +59,31 @@ bsr64(uint64_t v)
 {
 #ifdef _MSC_VER
 #  ifdef _M_AMD64
-	unsigned long result;
-	_BitScanReverse64(&result, v);
-	return result;
+        unsigned long result;
+        _BitScanReverse64(&result, v);
+        return result;
 #  else
-	unsigned long index;
-	if (_BitScanReverse(&index, v >> 32))
-		return index + 32;
+        unsigned long index;
+        if (_BitScanReverse(&index, v >> 32))
+                return index + 32;
 
-	_BitScanReverse(&index, v & 0xffffffffu);
+        _BitScanReverse(&index, v & 0xffffffffu);
 
-	return index;
+        return index;
 #  endif
 #else
-	return 63 - __builtin_clzll(v);
+        return 63 - __builtin_clzll(v);
 #endif
 }
 
 static attrib_forceinline unsigned
 bsrw(machine_word_t v)
 {
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32((uint32_t)v);
-	else
-		return bsr64(v);
+        STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+        if (WORDBITS == 32)
+                return bsr32((uint32_t)v);
+        else
+                return bsr64(v);
 }
 
 /*
@@ -96,11 +96,11 @@ static attrib_forceinline unsigned
 bsf32(uint32_t v)
 {
 #ifdef _MSC_VER
-	unsigned long result;
-	_BitScanForward(&result, v);
-	return result;
+        unsigned long result;
+        _BitScanForward(&result, v);
+        return result;
 #else
-	return __builtin_ctz(v);
+        return __builtin_ctz(v);
 #endif
 }
 
@@ -109,32 +109,32 @@ bsf64(uint64_t v)
 {
 #ifdef _MSC_VER
 #  ifdef _M_AMD64
-	unsigned long result;
-	_BitScanForward64(&result, v);
-	return result;
+        unsigned long result;
+        _BitScanForward64(&result, v);
+        return result;
 #  else
-	unsigned long index;
-	if (_BitScanForward(&index, v & 0xffffffffu))
-		return index;
+        unsigned long index;
+        if (_BitScanForward(&index, v & 0xffffffffu))
+                return index;
 
-	if (_BitScanForward(&index, v >> 32))
-		index += 32;
+        if (_BitScanForward(&index, v >> 32))
+                index += 32;
 
-	return -1;
+        return -1;
 #  endif
 #else
-	return __builtin_ctzll(v);
+        return __builtin_ctzll(v);
 #endif
 }
 
 static attrib_forceinline unsigned
 bsfw(machine_word_t v)
 {
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(v);
-	else
-		return bsf64(v);
+        STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+        if (WORDBITS == 32)
+                return bsf32(v);
+        else
+                return bsf64(v);
 }
 
 /* Return the log base 2 of 'n', rounded up to the nearest integer. */
@@ -150,7 +150,7 @@ ilog2_ceil(size_t n)
 static attrib_forceinline size_t
 roundup_pow_of_2(size_t n)
 {
-	return (size_t)1 << ilog2_ceil(n);
+        return (size_t)1 << ilog2_ceil(n);
 }
 
 #endif /* _LIBLZX_BITOPS_H */

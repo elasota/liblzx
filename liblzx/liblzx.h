@@ -37,60 +37,60 @@ typedef void *(*liblzx_alloc_func_t)(void *opaque, size_t size);
 typedef void (*liblzx_free_func_t)(void *opaque, void *ptr);
 
 enum liblzx_variant {
-	/* LZX variant used by CAB files and LZX DELTA */
-	LIBLZX_VARIANT_CAB_DELTA,
+        /* LZX variant used by CAB files and LZX DELTA */
+        LIBLZX_VARIANT_CAB_DELTA,
 
-	/* LZX variant used by WIM */
-	LIBLZX_VARIANT_WIM,
+        /* LZX variant used by WIM */
+        LIBLZX_VARIANT_WIM,
 };
 
 enum liblzx_constant {
-	LIBLZX_CONST_DEFAULT_CHUNK_SIZE = 32768,
-	LIBLZX_CONST_DEFAULT_E8_FILE_SIZE = 12 * 1024 * 1024,
-	LIBLZX_CONST_MAX_WINDOW_SIZE = 64 * 1024 * 1024,
+        LIBLZX_CONST_DEFAULT_CHUNK_SIZE = 32768,
+        LIBLZX_CONST_DEFAULT_E8_FILE_SIZE = 12 * 1024 * 1024,
+        LIBLZX_CONST_MAX_WINDOW_SIZE = 64 * 1024 * 1024,
 };
 
 struct liblzx_output_chunk {
-	const void *data;
-	size_t size;
+        const void *data;
+        size_t size;
 };
 
 struct liblzx_compress_properties {
-	/* LZX variant to use */
-	liblzx_variant_t lzx_variant;
+        /* LZX variant to use */
+        liblzx_variant_t lzx_variant;
 
-	/* Source file size for LZX DELTA.  Ignored for WIM.
-	 * When using this, use liblzx_compress_add_input to add the source
-	 * file's data before adding the new file's data.  For compression
-	 * only, set this to 0.
-	 */
-	size_t delta_source_size;
+        /* Source file size for LZX DELTA.  Ignored for WIM.
+         * When using this, use liblzx_compress_add_input to add the source
+         * file's data before adding the new file's data.  For compression
+         * only, set this to 0.
+         */
+        size_t delta_source_size;
 
-	/* Compression window size. */
-	uint32_t window_size;
+        /* Compression window size. */
+        uint32_t window_size;
 
-	/* Granularity of a chunk.  Should generally be set to
-	 * LIBLZX_CONST_DEFAULT_CHUNK_SIZE.
-	 */
-	uint32_t chunk_granularity;
+        /* Granularity of a chunk.  Should generally be set to
+         * LIBLZX_CONST_DEFAULT_CHUNK_SIZE.
+         */
+        uint32_t chunk_granularity;
 
-	/* Compression level.  Can be set arbitrarily high. */
-	uint16_t compression_level;
+        /* Compression level.  Can be set arbitrarily high. */
+        uint16_t compression_level;
 
-	/* E8 file size parameter.  For WIM, this is ignored.  For other
-	 * variants, this value is expected to be user-controllable and
-	 * is sent outside of the LZX data stream.
-	 */
-	uint32_t e8_file_size;
+        /* E8 file size parameter.  For WIM, this is ignored.  For other
+         * variants, this value is expected to be user-controllable and
+         * is sent outside of the LZX data stream.
+         */
+        uint32_t e8_file_size;
 
-	/* Memory allocation function. */
-	liblzx_alloc_func_t alloc_func;
+        /* Memory allocation function. */
+        liblzx_alloc_func_t alloc_func;
 
-	/* Memory free function. */
-	liblzx_free_func_t free_func;
+        /* Memory free function. */
+        liblzx_free_func_t free_func;
 
-	/* Userdata parameter to pass to alloc function. */
-	void *userdata;
+        /* Userdata parameter to pass to alloc function. */
+        void *userdata;
 };
 
 #ifdef __cplusplus
@@ -117,7 +117,7 @@ liblzx_compress_reset(liblzx_compressor_t *stream);
  */
 size_t
 liblzx_compress_add_input(liblzx_compressor_t *stream, const void *in_data,
-			  size_t in_data_size);
+                          size_t in_data_size);
 
 /* Returns the next compressed chunk.  This doesn't consume the chunk in the
  * process, so repeated calls will keep returning the same chunk.  If no chunk

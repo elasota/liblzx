@@ -27,7 +27,7 @@ typedef le16_t utf16lechar;
  */
 typedef size_t machine_word_t;
 
-#define WORDBYTES	sizeof(machine_word_t)
-#define WORDBITS	(8 * WORDBYTES)
+#define WORDBYTES        sizeof(machine_word_t)
+#define WORDBITS         (8 * WORDBYTES)
 
 #endif /* _LIBLZX_TYPES_H */

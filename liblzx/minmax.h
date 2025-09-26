@@ -37,86 +37,86 @@
 static attrib_forceinline double
 min_double(double a, double b)
 {
-	return (a < b) ? a : b;
+        return (a < b) ? a : b;
 }
 
 static attrib_forceinline float
 min_float(float a, float b)
 {
-	return (a < b) ? a : b;
+        return (a < b) ? a : b;
 }
 
 static attrib_forceinline unsigned
 min_uint(unsigned a, unsigned b)
 {
-	return (a < b) ? a : b;
+        return (a < b) ? a : b;
 }
 
 static attrib_forceinline unsigned
 min_u32(unsigned a, unsigned b)
 {
-	return (a < b) ? a : b;
+        return (a < b) ? a : b;
 }
 
 static attrib_forceinline size_t
 min_size(size_t a, size_t b)
 {
-	return (a < b) ? a : b;
+        return (a < b) ? a : b;
 }
 
 static attrib_forceinline intmax_t
 min_int(int a, int b)
 {
-	return (a < b) ? a : b;
+        return (a < b) ? a : b;
 }
 
 static attrib_forceinline void *
 min_ptr(void *a, void *b)
 {
-	return (a < b) ? a : b;
+        return (a < b) ? a : b;
 }
 
 static attrib_forceinline const void *
 min_constptr(const void *a, const void *b)
 {
-	return (a < b) ? a : b;
+        return (a < b) ? a : b;
 }
 
 /* Get the maximum of two variables, without multiple evaluation.  */
 static attrib_forceinline double
 max_float(double a, double b)
 {
-	return (a > b) ? a : b;
+        return (a > b) ? a : b;
 }
 
 static attrib_forceinline unsigned
 max_uint(unsigned a, unsigned b)
 {
-	return (a > b) ? a : b;
+        return (a > b) ? a : b;
 }
 
 static attrib_forceinline uint32_t
 max_u32(uint32_t a, uint32_t b)
 {
-	return (a > b) ? a : b;
+        return (a > b) ? a : b;
 }
 
 static attrib_forceinline uint64_t
 max_u64(uint64_t a, uint64_t b)
 {
-	return (a > b) ? a : b;
+        return (a > b) ? a : b;
 }
 
 static attrib_forceinline void *
 max_ptr(void *a, void *b)
 {
-	return (a > b) ? a : b;
+        return (a > b) ? a : b;
 }
 
 static attrib_forceinline const void *
 max_constptr(const void *a, const void *b)
 {
-	return (a > b) ? a : b;
+        return (a > b) ? a : b;
 }
 
 #endif

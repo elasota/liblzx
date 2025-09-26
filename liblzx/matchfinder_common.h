@@ -41,10 +41,10 @@
 static attrib_forceinline uint32_t
 loaded_u32_to_u24(uint32_t v)
 {
-	if (CPU_IS_LITTLE_ENDIAN())
-		return v & 0xFFFFFF;
-	else
-		return v >> 8;
+        if (CPU_IS_LITTLE_ENDIAN())
+                return v & 0xFFFFFF;
+        else
+                return v >> 8;
 }
 
 /*
@@ -56,12 +56,12 @@ static attrib_forceinline uint32_t
 load_u24_unaligned(const uint8_t *p)
 {
 #if UNALIGNED_ACCESS_IS_FAST
-	return loaded_u32_to_u24(load_u32_unaligned(p));
+        return loaded_u32_to_u24(load_u32_unaligned(p));
 #else
-	if (CPU_IS_LITTLE_ENDIAN())
-		return ((uint32_t)p[0] << 0) | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16);
-	else
-		return ((uint32_t)p[2] << 0) | ((uint32_t)p[1] << 8) | ((uint32_t)p[0] << 16);
+        if (CPU_IS_LITTLE_ENDIAN())
+                return ((uint32_t)p[0] << 0) | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16);
+        else
+                return ((uint32_t)p[2] << 0) | ((uint32_t)p[1] << 8) | ((uint32_t)p[0] << 16);
 #endif
 }
 
@@ -75,7 +75,7 @@ load_u24_unaligned(const uint8_t *p)
 static attrib_forceinline uint32_t
 lz_hash(uint32_t seq, unsigned num_bits)
 {
-	return (uint32_t)(seq * 0x1E35A7BD) >> (32 - num_bits);
+        return (uint32_t)(seq * 0x1E35A7BD) >> (32 - num_bits);
 }
 
 /*
@@ -84,48 +84,48 @@ lz_hash(uint32_t seq, unsigned num_bits)
  */
 static attrib_forceinline unsigned
 lz_extend(const uint8_t * const strptr, const uint8_t * const matchptr,
-	  const unsigned start_len, const unsigned max_len)
+          const unsigned start_len, const unsigned max_len)
 {
-	unsigned len = start_len;
-	machine_word_t v_word;
+        unsigned len = start_len;
+        machine_word_t v_word;
 
-	if (UNALIGNED_ACCESS_IS_FAST) {
+        if (UNALIGNED_ACCESS_IS_FAST) {
 
-		if (likely(max_len - len >= 4 * WORDBYTES)) {
+                if (likely(max_len - len >= 4 * WORDBYTES)) {
 
-		#define COMPARE_WORD_STEP				\
-			v_word = load_word_unaligned(&matchptr[len]) ^	\
-				 load_word_unaligned(&strptr[len]);	\
-			if (v_word != 0)				\
-				goto word_differs;			\
-			len += WORDBYTES;				\
+                #define COMPARE_WORD_STEP                               \
+                        v_word = load_word_unaligned(&matchptr[len]) ^  \
+                                 load_word_unaligned(&strptr[len]);     \
+                        if (v_word != 0)                                \
+                                goto word_differs;                      \
+                        len += WORDBYTES;                               \
 
-			COMPARE_WORD_STEP
-			COMPARE_WORD_STEP
-			COMPARE_WORD_STEP
-			COMPARE_WORD_STEP
-		#undef COMPARE_WORD_STEP
-		}
+                        COMPARE_WORD_STEP
+                        COMPARE_WORD_STEP
+                        COMPARE_WORD_STEP
+                        COMPARE_WORD_STEP
+                #undef COMPARE_WORD_STEP
+                }
 
-		while (len + WORDBYTES <= max_len) {
-			v_word = load_word_unaligned(&matchptr[len]) ^
-				 load_word_unaligned(&strptr[len]);
-			if (v_word != 0)
-				goto word_differs;
-			len += WORDBYTES;
-		}
-	}
+                while (len + WORDBYTES <= max_len) {
+                        v_word = load_word_unaligned(&matchptr[len]) ^
+                                 load_word_unaligned(&strptr[len]);
+                        if (v_word != 0)
+                                goto word_differs;
+                        len += WORDBYTES;
+                }
+        }
 
-	while (len < max_len && matchptr[len] == strptr[len])
-		len++;
-	return len;
+        while (len < max_len && matchptr[len] == strptr[len])
+                len++;
+        return len;
 
 word_differs:
-	if (CPU_IS_LITTLE_ENDIAN())
-		len += (bsfw(v_word) >> 3);
-	else
-		len += (WORDBITS - 1 - bsrw(v_word)) >> 3;
-	return len;
+        if (CPU_IS_LITTLE_ENDIAN())
+                len += (bsfw(v_word) >> 3);
+        else
+                len += (WORDBITS - 1 - bsrw(v_word)) >> 3;
+        return len;
 }
 
 #endif /* _LIBLZX_MATCHFINDER_COMMON_H */

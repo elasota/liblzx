@@ -47,56 +47,56 @@
 /* Watch out for conflict with ntfs-3g/endians.h ... */
 #ifndef _NTFS_ENDIANS_H
 
-#define bswap16_const(n)			\
-	((((uint16_t)(n) & 0x00FF) << 8)	|	\
-	 (((uint16_t)(n) & 0xFF00) >> 8))
+#define bswap16_const(n)                        \
+        ((((uint16_t)(n) & 0x00FF) << 8)        |       \
+         (((uint16_t)(n) & 0xFF00) >> 8))
 
-#define bswap32_const(n)				\
-	((((uint32_t)(n) & 0x000000FF) << 24)	|	\
-	 (((uint32_t)(n) & 0x0000FF00) << 8)		|	\
-	 (((uint32_t)(n) & 0x00FF0000) >> 8)		|	\
-	 (((uint32_t)(n) & 0xFF000000) >> 24))
+#define bswap32_const(n)                                \
+        ((((uint32_t)(n) & 0x000000FF) << 24)   |       \
+         (((uint32_t)(n) & 0x0000FF00) << 8)    |       \
+         (((uint32_t)(n) & 0x00FF0000) >> 8)    |       \
+         (((uint32_t)(n) & 0xFF000000) >> 24))
 
-#define bswap64_const(n)					\
-	((((uint64_t)(n) & 0x00000000000000FF) << 56)	|	\
-	 (((uint64_t)(n) & 0x000000000000FF00) << 40)	|	\
-	 (((uint64_t)(n) & 0x0000000000FF0000) << 24)	|	\
-	 (((uint64_t)(n) & 0x00000000FF000000) << 8)		|	\
-	 (((uint64_t)(n) & 0x000000FF00000000) >> 8)		|	\
-	 (((uint64_t)(n) & 0x0000FF0000000000) >> 24)	|	\
-	 (((uint64_t)(n) & 0x00FF000000000000) >> 40)	|	\
-	 (((uint64_t)(n) & 0xFF00000000000000) >> 56))
+#define bswap64_const(n)                                \
+        ((((uint64_t)(n) & 0x00000000000000FF) << 56)   |       \
+         (((uint64_t)(n) & 0x000000000000FF00) << 40)   |       \
+         (((uint64_t)(n) & 0x0000000000FF0000) << 24)   |       \
+         (((uint64_t)(n) & 0x00000000FF000000) << 8)    |       \
+         (((uint64_t)(n) & 0x000000FF00000000) >> 8)    |       \
+         (((uint64_t)(n) & 0x0000FF0000000000) >> 24)   |       \
+         (((uint64_t)(n) & 0x00FF000000000000) >> 40)   |       \
+         (((uint64_t)(n) & 0xFF00000000000000) >> 56))
 
 static attrib_forceinline uint16_t do_bswap16(uint16_t n)
 {
 #ifdef _MSC_VER
-	return _byteswap_ushort(n);
+        return _byteswap_ushort(n);
 #elif GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-	return __builtin_bswap16(n);
+        return __builtin_bswap16(n);
 #else
-	return bswap16_const(n);
+        return bswap16_const(n);
 #endif
 }
 
 static attrib_forceinline uint32_t do_bswap32(uint32_t n)
 {
 #ifdef _MSC_VER
-	return _byteswap_ulong(n);
+        return _byteswap_ulong(n);
 #elif GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-	return __builtin_bswap32(n);
+        return __builtin_bswap32(n);
 #else
-	return bswap32_const(n);
+        return bswap32_const(n);
 #endif
 }
 
 static attrib_forceinline uint64_t do_bswap64(uint64_t n)
 {
 #ifdef _MSC_VER
-	return _byteswap_uint64(n);
+        return _byteswap_uint64(n);
 #elif GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-	return __builtin_bswap64(n);
+        return __builtin_bswap64(n);
 #else
-	return bswap64_const(n);
+        return bswap64_const(n);
 #endif
 }
 

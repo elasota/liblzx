@@ -31,4 +31,4 @@ IncludeBlocks: Preserve
 IndentCaseLabels: false
 IndentWidth: 8
 SpaceBeforeParens: ControlStatementsExceptControlMacros
-UseTab: Always
+UseTab: Never
