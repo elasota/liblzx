@@ -46,11 +46,11 @@
  * satisfied in the subtree rooted at A[subtree_idx].  'A' uses 1-based indices.
  */
 static void
-heapify_subtree(u32 A[], unsigned length, unsigned subtree_idx)
+heapify_subtree(uint32_t A[], unsigned length, unsigned subtree_idx)
 {
 	unsigned parent_idx;
 	unsigned child_idx;
-	u32 v;
+	uint32_t v;
 
 	v = A[subtree_idx];
 	parent_idx = subtree_idx;
@@ -70,7 +70,7 @@ heapify_subtree(u32 A[], unsigned length, unsigned subtree_idx)
  * 'A' uses 1-based indices, so the children of A[i] are A[i*2] and A[i*2 + 1].
  */
 static void
-heapify_array(u32 A[], unsigned length)
+heapify_array(uint32_t A[], unsigned length)
 {
 	unsigned subtree_idx;
 
@@ -86,14 +86,14 @@ heapify_array(u32 A[], unsigned length)
  * necessary when compiling with -D_ANSI_SOURCE, which is the better solution.
  */
 static void
-heap_sort(u32 A[], unsigned length)
+heap_sort(uint32_t A[], unsigned length)
 {
 	A--; /* Use 1-based indices  */
 
 	heapify_array(A, length);
 
 	while (length >= 2) {
-		u32 tmp = A[length];
+		uint32_t tmp = A[length];
 
 		A[length] = A[1];
 		A[1] = tmp;
@@ -134,7 +134,7 @@ heap_sort(u32 A[], unsigned length)
  * number of symbols that have nonzero frequency.
  */
 static unsigned
-sort_symbols(unsigned num_syms, const u32 freqs[], u8 lens[], u32 symout[])
+sort_symbols(unsigned num_syms, const uint32_t freqs[], uint8_t lens[], uint32_t symout[])
 {
 	unsigned sym;
 	unsigned i;
@@ -178,7 +178,7 @@ sort_symbols(unsigned num_syms, const u32 freqs[], u8 lens[], u32 symout[])
 	 * set the codeword lengths of zero-frequency symbols to 0.
 	 */
 	for (sym = 0; sym < num_syms; sym++) {
-		u32 freq = freqs[sym];
+		uint32_t freq = freqs[sym];
 
 		if (freq != 0) {
 			symout[counters[min_size(freq, num_counters - 1)]++] =
@@ -227,7 +227,7 @@ sort_symbols(unsigned num_syms, const u32 freqs[], u8 lens[], u32 symout[])
  * implementation only generates the non-leaf nodes of the tree.
  */
 static void
-build_tree(u32 A[], unsigned sym_count)
+build_tree(uint32_t A[], unsigned sym_count)
 {
 	const unsigned last_idx = sym_count - 1;
 
@@ -244,7 +244,7 @@ build_tree(u32 A[], unsigned sym_count)
 	unsigned e = 0;
 
 	do {
-		u32 new_freq;
+		uint32_t new_freq;
 
 		/*
 		 * Select the next two lowest frequency nodes among the leaves
@@ -310,7 +310,7 @@ build_tree(u32 A[], unsigned sym_count)
  *	The maximum permissible codeword length.
  */
 static void
-compute_length_counts(u32 A[], unsigned root_idx, unsigned len_counts[],
+compute_length_counts(uint32_t A[], unsigned root_idx, unsigned len_counts[],
 		      unsigned max_codeword_len)
 {
 	unsigned len;
@@ -405,10 +405,10 @@ compute_length_counts(u32 A[], unsigned root_idx, unsigned len_counts[],
  *	frequency.  This is the length of the 'A' and 'len' arrays.
  */
 static void
-gen_codewords(u32 A[], u8 lens[], const unsigned len_counts[],
+gen_codewords(uint32_t A[], uint8_t lens[], const unsigned len_counts[],
 	      unsigned max_codeword_len, unsigned num_syms)
 {
-	u32 next_codewords[MAX_CODEWORD_LEN + 1];
+	uint32_t next_codewords[MAX_CODEWORD_LEN + 1];
 	unsigned i;
 	unsigned len;
 	unsigned sym;
@@ -596,9 +596,9 @@ gen_codewords(u32 A[], u8 lens[], const unsigned len_counts[],
  */
 void
 make_canonical_huffman_code(unsigned num_syms, unsigned max_codeword_len,
-			    const u32 freqs[], u8 lens[], u32 codewords[])
+			    const uint32_t freqs[], uint8_t lens[], uint32_t codewords[])
 {
-	u32 *A = codewords;
+	uint32_t *A = codewords;
 	unsigned num_used_syms;
 
 	assert(num_syms <= MAX_NUM_SYMS);

@@ -43,7 +43,7 @@
  */
 
 static attrib_forceinline unsigned
-bsr32(u32 v)
+bsr32(uint32_t v)
 {
 #ifdef _MSC_VER
 	unsigned long result;
@@ -55,7 +55,7 @@ bsr32(u32 v)
 }
 
 static attrib_forceinline unsigned
-bsr64(u64 v)
+bsr64(uint64_t v)
 {
 #ifdef _MSC_VER
 #  ifdef _M_AMD64
@@ -81,7 +81,7 @@ bsrw(machine_word_t v)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsr32((u32)v);
+		return bsr32((uint32_t)v);
 	else
 		return bsr64(v);
 }
@@ -93,7 +93,7 @@ bsrw(machine_word_t v)
  */
 
 static attrib_forceinline unsigned
-bsf32(u32 v)
+bsf32(uint32_t v)
 {
 #ifdef _MSC_VER
 	unsigned long result;
@@ -105,7 +105,7 @@ bsf32(u32 v)
 }
 
 static attrib_forceinline unsigned
-bsf64(u64 v)
+bsf64(uint64_t v)
 {
 #ifdef _MSC_VER
 #  ifdef _M_AMD64

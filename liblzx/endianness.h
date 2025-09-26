@@ -48,26 +48,26 @@
 #ifndef _NTFS_ENDIANS_H
 
 #define bswap16_const(n)			\
-	((((u16)(n) & 0x00FF) << 8)	|	\
-	 (((u16)(n) & 0xFF00) >> 8))
+	((((uint16_t)(n) & 0x00FF) << 8)	|	\
+	 (((uint16_t)(n) & 0xFF00) >> 8))
 
 #define bswap32_const(n)				\
-	((((u32)(n) & 0x000000FF) << 24)	|	\
-	 (((u32)(n) & 0x0000FF00) << 8)		|	\
-	 (((u32)(n) & 0x00FF0000) >> 8)		|	\
-	 (((u32)(n) & 0xFF000000) >> 24))
+	((((uint32_t)(n) & 0x000000FF) << 24)	|	\
+	 (((uint32_t)(n) & 0x0000FF00) << 8)		|	\
+	 (((uint32_t)(n) & 0x00FF0000) >> 8)		|	\
+	 (((uint32_t)(n) & 0xFF000000) >> 24))
 
 #define bswap64_const(n)					\
-	((((u64)(n) & 0x00000000000000FF) << 56)	|	\
-	 (((u64)(n) & 0x000000000000FF00) << 40)	|	\
-	 (((u64)(n) & 0x0000000000FF0000) << 24)	|	\
-	 (((u64)(n) & 0x00000000FF000000) << 8)		|	\
-	 (((u64)(n) & 0x000000FF00000000) >> 8)		|	\
-	 (((u64)(n) & 0x0000FF0000000000) >> 24)	|	\
-	 (((u64)(n) & 0x00FF000000000000) >> 40)	|	\
-	 (((u64)(n) & 0xFF00000000000000) >> 56))
+	((((uint64_t)(n) & 0x00000000000000FF) << 56)	|	\
+	 (((uint64_t)(n) & 0x000000000000FF00) << 40)	|	\
+	 (((uint64_t)(n) & 0x0000000000FF0000) << 24)	|	\
+	 (((uint64_t)(n) & 0x00000000FF000000) << 8)		|	\
+	 (((uint64_t)(n) & 0x000000FF00000000) >> 8)		|	\
+	 (((uint64_t)(n) & 0x0000FF0000000000) >> 24)	|	\
+	 (((uint64_t)(n) & 0x00FF000000000000) >> 40)	|	\
+	 (((uint64_t)(n) & 0xFF00000000000000) >> 56))
 
-static attrib_forceinline u16 do_bswap16(u16 n)
+static attrib_forceinline uint16_t do_bswap16(uint16_t n)
 {
 #ifdef _MSC_VER
 	return _byteswap_ushort(n);
@@ -78,7 +78,7 @@ static attrib_forceinline u16 do_bswap16(u16 n)
 #endif
 }
 
-static attrib_forceinline u32 do_bswap32(u32 n)
+static attrib_forceinline uint32_t do_bswap32(uint32_t n)
 {
 #ifdef _MSC_VER
 	return _byteswap_ulong(n);
@@ -89,7 +89,7 @@ static attrib_forceinline u32 do_bswap32(u32 n)
 #endif
 }
 
-static attrib_forceinline u64 do_bswap64(u64 n)
+static attrib_forceinline uint64_t do_bswap64(uint64_t n)
 {
 #ifdef _MSC_VER
 	return _byteswap_uint64(n);
@@ -105,31 +105,31 @@ static attrib_forceinline u64 do_bswap64(u64 n)
 #define bswap64(n) (__builtin_constant_p(n) ? bswap64_const(n) : do_bswap64(n))
 
 #if CPU_IS_BIG_ENDIAN()
-#  define cpu_to_le16(n) ((_force_attr le16)bswap16(n))
-#  define cpu_to_le32(n) ((_force_attr le32)bswap32(n))
-#  define cpu_to_le64(n) ((_force_attr le64)bswap64(n))
-#  define le16_to_cpu(n) bswap16((_force_attr u16)(le16)(n))
-#  define le32_to_cpu(n) bswap32((_force_attr u32)(le32)(n))
-#  define le64_to_cpu(n) bswap64((_force_attr u64)(le64)(n))
-#  define cpu_to_be16(n) ((_force_attr be16)(u16)(n))
-#  define cpu_to_be32(n) ((_force_attr be32)(u32)(n))
-#  define cpu_to_be64(n) ((_force_attr be64)(u64)(n))
-#  define be16_to_cpu(n) ((_force_attr u16)(be16)(n))
-#  define be32_to_cpu(n) ((_force_attr u32)(be32)(n))
-#  define be64_to_cpu(n) ((_force_attr u64)(be64)(n))
+#  define cpu_to_le16(n) ((_force_attr le16_t)bswap16(n))
+#  define cpu_to_le32(n) ((_force_attr le32_t)bswap32(n))
+#  define cpu_to_le64(n) ((_force_attr le64_t)bswap64(n))
+#  define le16_to_cpu(n) bswap16((_force_attr uint16_t)(le16_t)(n))
+#  define le32_to_cpu(n) bswap32((_force_attr uint32_t)(le32_t)(n))
+#  define le64_to_cpu(n) bswap64((_force_attr uint64_t)(le64_t)(n))
+#  define cpu_to_be16(n) ((_force_attr be16_t)(uint16_t)(n))
+#  define cpu_to_be32(n) ((_force_attr be32_t)(uint32_t)(n))
+#  define cpu_to_be64(n) ((_force_attr be64_t)(uint64_t)(n))
+#  define be16_to_cpu(n) ((_force_attr uint16_t)(be16_t)(n))
+#  define be32_to_cpu(n) ((_force_attr uint32_t)(be32_t)(n))
+#  define be64_to_cpu(n) ((_force_attr uint64_t)(be64_t)(n))
 #else
-#  define cpu_to_le16(n) ((_force_attr le16)(u16)(n))
-#  define cpu_to_le32(n) ((_force_attr le32)(u32)(n))
-#  define cpu_to_le64(n) ((_force_attr le64)(u64)(n))
-#  define le16_to_cpu(n) ((_force_attr u16)(le16)(n))
-#  define le32_to_cpu(n) ((_force_attr u32)(le32)(n))
-#  define le64_to_cpu(n) ((_force_attr u64)(le64)(n))
-#  define cpu_to_be16(n) ((_force_attr be16)bswap16(n))
-#  define cpu_to_be32(n) ((_force_attr be32)bswap32(n))
-#  define cpu_to_be64(n) ((_force_attr be64)bswap64(n))
-#  define be16_to_cpu(n) bswap16((_force_attr u16)(be16)(n))
-#  define be32_to_cpu(n) bswap32((_force_attr u32)(be32)(n))
-#  define be64_to_cpu(n) bswap64((_force_attr u64)(be64)(n))
+#  define cpu_to_le16(n) ((_force_attr le16_t)(uint16_t)(n))
+#  define cpu_to_le32(n) ((_force_attr le32_t)(uint32_t)(n))
+#  define cpu_to_le64(n) ((_force_attr le64_t)(uint64_t)(n))
+#  define le16_to_cpu(n) ((_force_attr uint16_t)(le16_t)(n))
+#  define le32_to_cpu(n) ((_force_attr uint32_t)(le32_t)(n))
+#  define le64_to_cpu(n) ((_force_attr uint64_t)(le64_t)(n))
+#  define cpu_to_be16(n) ((_force_attr be16_t)bswap16(n))
+#  define cpu_to_be32(n) ((_force_attr be32_t)bswap32(n))
+#  define cpu_to_be64(n) ((_force_attr be64_t)bswap64(n))
+#  define be16_to_cpu(n) bswap16((_force_attr uint16_t)(be16_t)(n))
+#  define be32_to_cpu(n) bswap32((_force_attr uint32_t)(be32_t)(n))
+#  define be64_to_cpu(n) bswap64((_force_attr uint64_t)(be64_t)(n))
 #endif
 
 #endif /* _NTFS_ENDIANS_H */

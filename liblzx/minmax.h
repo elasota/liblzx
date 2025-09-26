@@ -95,14 +95,14 @@ max_uint(unsigned a, unsigned b)
 	return (a > b) ? a : b;
 }
 
-static attrib_forceinline u32
-max_u32(u32 a, u32 b)
+static attrib_forceinline uint32_t
+max_u32(uint32_t a, uint32_t b)
 {
 	return (a > b) ? a : b;
 }
 
-static attrib_forceinline u64
-max_u64(u64 a, u64 b)
+static attrib_forceinline uint64_t
+max_u64(uint64_t a, uint64_t b)
 {
 	return (a > b) ? a : b;
 }

@@ -198,28 +198,28 @@ TEMPLATED(hc_matchfinder_init)(struct TEMPLATED(hc_matchfinder) * mf,
  * Return the length of the match found, or 'best_len' if no match longer than
  * 'best_len' was found.
  */
-static attrib_forceinline u32
+static attrib_forceinline uint32_t
 TEMPLATED(hc_matchfinder_longest_match)(struct TEMPLATED(hc_matchfinder) * const mf,
-					const u8 * const in_begin,
-				        u32 in_min_pos,
-					const u8 * const in_next,
-					u32 best_len,
-					const u32 max_find_len,
-					const u32 max_produce_len,
-					const u32 nice_len,
-					const u32 max_search_depth,
-					u32 * const next_hashes,
-					u32 * const offset_ret)
+					const uint8_t * const in_begin,
+				        uint32_t in_min_pos,
+					const uint8_t * const in_next,
+					uint32_t best_len,
+					const uint32_t max_find_len,
+					const uint32_t max_produce_len,
+					const uint32_t nice_len,
+					const uint32_t max_search_depth,
+					uint32_t * const next_hashes,
+					uint32_t * const offset_ret)
 {
-	u32 depth_remaining = max_search_depth;
-	const u8 *best_matchptr = in_next;
+	uint32_t depth_remaining = max_search_depth;
+	const uint8_t *best_matchptr = in_next;
 	mf_pos_t cur_node3, cur_node4;
-	u32 hash3, hash4;
-	u32 next_hashseq;
-	u32 seq4;
-	const u8 *matchptr;
-	u32 len;
-	u32 cur_pos = in_next - in_begin;
+	uint32_t hash3, hash4;
+	uint32_t next_hashseq;
+	uint32_t seq4;
+	const uint8_t *matchptr;
+	uint32_t len;
+	uint32_t cur_pos = in_next - in_begin;
 
 	/* can we read 4 bytes from 'in_next + 1'? */
 	if (unlikely(max_find_len < HC_MATCHFINDER_REQUIRED_NBYTES))
@@ -382,16 +382,16 @@ out:
  */
 static attrib_forceinline void
 TEMPLATED(hc_matchfinder_skip_bytes)(struct TEMPLATED(hc_matchfinder) * const mf,
-				     const u8 * const in_begin,
-				     const u8 *in_next,
-				     const u8 * const in_end,
-				     const u32 count,
-				     u32 * const next_hashes)
+				     const uint8_t * const in_begin,
+				     const uint8_t *in_next,
+				     const uint8_t * const in_end,
+				     const uint32_t count,
+				     uint32_t * const next_hashes)
 {
-	u32 cur_pos;
-	u32 hash3, hash4;
-	u32 next_hashseq;
-	u32 remaining = count;
+	uint32_t cur_pos;
+	uint32_t hash3, hash4;
+	uint32_t next_hashseq;
+	uint32_t remaining = count;
 
 	if (unlikely(count + HC_MATCHFINDER_REQUIRED_NBYTES > in_end - in_next))
 		return;
@@ -422,7 +422,7 @@ TEMPLATED(hc_matchfinder_skip_bytes)(struct TEMPLATED(hc_matchfinder) * const mf
  */
 static attrib_forceinline void
 TEMPLATED(hc_matchfinder_cull)(struct TEMPLATED(hc_matchfinder) * mf,
-			       u32 cull_size, u32 window_size)
+			       uint32_t cull_size, uint32_t window_size)
 {
 	const size_t mf_count =
 	    TEMPLATED(hc_matchfinder_size)(window_size, true) /

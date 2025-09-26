@@ -7,32 +7,18 @@
 
 #include "compiler.h"
 
-#ifndef _NTFS_TYPES_H
-/* Unsigned integer types of exact size in bits */
-typedef uint8_t  u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-
-/* Signed integer types of exact size in bits */
-typedef int8_t  s8;
-typedef int16_t s16;
-typedef int32_t s32;
-typedef int64_t s64;
-
 /* Unsigned little endian types of exact size */
-typedef uint16_t _bitwise_attr le16;
-typedef uint32_t _bitwise_attr le32;
-typedef uint64_t _bitwise_attr le64;
+typedef uint16_t _bitwise_attr le16_t;
+typedef uint32_t _bitwise_attr le32_t;
+typedef uint64_t _bitwise_attr le64_t;
 
 /* Unsigned big endian types of exact size */
-typedef uint16_t _bitwise_attr be16;
-typedef uint32_t _bitwise_attr be32;
-typedef uint64_t _bitwise_attr be64;
-#endif
+typedef uint16_t _bitwise_attr be16_t;
+typedef uint32_t _bitwise_attr be32_t;
+typedef uint64_t _bitwise_attr be64_t;
 
 /* A pointer to 'utf16lechar' indicates a UTF-16LE encoded string */
-typedef le16 utf16lechar;
+typedef le16_t utf16lechar;
 
 /*
  * Type of a machine word.  'unsigned long' would be logical, but that is only

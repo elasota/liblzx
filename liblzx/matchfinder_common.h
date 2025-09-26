@@ -38,8 +38,8 @@
  * bits contain the first 3 bytes, arranged in octets in a platform-dependent
  * order, at the memory location from which the input 32-bit value was loaded.
  */
-static attrib_forceinline u32
-loaded_u32_to_u24(u32 v)
+static attrib_forceinline uint32_t
+loaded_u32_to_u24(uint32_t v)
 {
 	if (CPU_IS_LITTLE_ENDIAN())
 		return v & 0xFFFFFF;
@@ -52,16 +52,16 @@ loaded_u32_to_u24(u32 v)
  * The order in which the 3 bytes will be arranged as octets in the 24 bits is
  * platform-dependent.  At least 4 bytes (not 3) must be available at @p.
  */
-static attrib_forceinline u32
-load_u24_unaligned(const u8 *p)
+static attrib_forceinline uint32_t
+load_u24_unaligned(const uint8_t *p)
 {
 #if UNALIGNED_ACCESS_IS_FAST
 	return loaded_u32_to_u24(load_u32_unaligned(p));
 #else
 	if (CPU_IS_LITTLE_ENDIAN())
-		return ((u32)p[0] << 0) | ((u32)p[1] << 8) | ((u32)p[2] << 16);
+		return ((uint32_t)p[0] << 0) | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16);
 	else
-		return ((u32)p[2] << 0) | ((u32)p[1] << 8) | ((u32)p[0] << 16);
+		return ((uint32_t)p[2] << 0) | ((uint32_t)p[1] << 8) | ((uint32_t)p[0] << 16);
 #endif
 }
 
@@ -72,10 +72,10 @@ load_u24_unaligned(const u8 *p)
  * next-highest @num_bits bits of the product as the hash value, as those have
  * the most randomness.
  */
-static attrib_forceinline u32
-lz_hash(u32 seq, unsigned num_bits)
+static attrib_forceinline uint32_t
+lz_hash(uint32_t seq, unsigned num_bits)
 {
-	return (u32)(seq * 0x1E35A7BD) >> (32 - num_bits);
+	return (uint32_t)(seq * 0x1E35A7BD) >> (32 - num_bits);
 }
 
 /*
@@ -83,7 +83,7 @@ lz_hash(u32 seq, unsigned num_bits)
  * to a maximum of @max_len.  Initially, @start_len bytes are matched.
  */
 static attrib_forceinline unsigned
-lz_extend(const u8 * const strptr, const u8 * const matchptr,
+lz_extend(const uint8_t * const strptr, const uint8_t * const matchptr,
 	  const unsigned start_len, const unsigned max_len)
 {
 	unsigned len = start_len;

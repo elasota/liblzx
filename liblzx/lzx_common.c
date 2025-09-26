@@ -44,7 +44,7 @@
 
 /* Mapping: offset slot => first match offset that uses that offset slot.
  * The offset slots for repeat offsets map to "fake" offsets < 1.  */
-const s32 lzx_offset_slot_base[LZX_MAX_OFFSET_SLOTS + 1] = {
+const int32_t lzx_offset_slot_base[LZX_MAX_OFFSET_SLOTS + 1] = {
         -2     , -1     , 0      , 1      , 2      ,    /* 0  --- 4  */
         4      , 6      , 10     , 14     , 22     ,    /* 5  --- 9  */
         30     , 46     , 62     , 94     , 126    ,    /* 10 --- 14 */
@@ -60,7 +60,7 @@ const s32 lzx_offset_slot_base[LZX_MAX_OFFSET_SLOTS + 1] = {
 
 /* Mapping: offset slot => how many extra bits must be read and added to the
  * corresponding offset slot base to decode the match offset.  */
-const u8 lzx_extra_offset_bits[LZX_MAX_OFFSET_SLOTS] = {
+const uint8_t lzx_extra_offset_bits[LZX_MAX_OFFSET_SLOTS] = {
 	0 , 0 , 0 , 0 , 1 ,
 	1 , 2 , 2 , 3 , 3 ,
 	4 , 4 , 5 , 5 , 6 ,
@@ -95,19 +95,19 @@ lzx_get_num_main_syms(unsigned window_order)
 	 * bytes were to match the last two bytes.  However, the format
 	 * disallows this case.  This reduces the number of needed offset slots
 	 * by 1.  */
-	u32 window_size = (u32)1 << window_order;
-	u32 max_offset = window_size - LZX_MIN_MATCH_LEN - 1;
+	uint32_t window_size = (uint32_t)1 << window_order;
+	uint32_t max_offset = window_size - LZX_MIN_MATCH_LEN - 1;
 	unsigned num_offset_slots = 30;
-	while (max_offset >= (u32)lzx_offset_slot_base[num_offset_slots])
+	while (max_offset >= (uint32_t)lzx_offset_slot_base[num_offset_slots])
 		num_offset_slots++;
 
 	return LZX_NUM_CHARS + (num_offset_slots * LZX_NUM_LEN_HEADERS);
 }
 
 static void
-do_translate_target(void *target, s32 input_pos, s32 e8_file_size)
+do_translate_target(void *target, int32_t input_pos, int32_t e8_file_size)
 {
-	s32 abs_offset, rel_offset;
+	int32_t abs_offset, rel_offset;
 
 	rel_offset = get_unaligned_le32(target);
 	if (rel_offset >= -input_pos && rel_offset < e8_file_size) {
@@ -123,9 +123,9 @@ do_translate_target(void *target, s32 input_pos, s32 e8_file_size)
 }
 
 static void
-undo_translate_target(void *target, s32 input_pos, s32 e8_file_size)
+undo_translate_target(void *target, int32_t input_pos, int32_t e8_file_size)
 {
-	s32 abs_offset, rel_offset;
+	int32_t abs_offset, rel_offset;
 
 	abs_offset = get_unaligned_le32(target);
 	if (abs_offset >= 0) {
@@ -170,13 +170,13 @@ undo_translate_target(void *target, s32 input_pos, s32 e8_file_size)
  * is always the same (LZX_WIM_MAGIC_FILESIZE == 12000000).
  */
 static void
-lzx_e8_filter(u8 *data, u32 size, u32 chunk_offset, u32 e8_file_size,
-	      void (*process_target)(void *, s32, s32))
+lzx_e8_filter(uint8_t *data, uint32_t size, uint32_t chunk_offset, uint32_t e8_file_size,
+	      void (*process_target)(void *, int32_t, int32_t))
 {
 
 #if !defined(__SSE2__) && !defined(__AVX2__)
-	u8 *tail;
-	u8 *p;
+	uint8_t *tail;
+	uint8_t *p;
 
 	if (size <= 10)
 		return;
@@ -189,15 +189,15 @@ lzx_e8_filter(u8 *data, u32 size, u32 chunk_offset, u32 e8_file_size,
 			continue;
 		}
 
-		(*process_target)(p + 1, (s32)(p - data + chunk_offset),
+		(*process_target)(p + 1, (int32_t)(p - data + chunk_offset),
 				  e8_file_size);
 		p += 5;
 	}
 #else
 	/* SSE2 or AVX-2 optimized version for x86_64  */
 
-	u8 *p = data;
-	u64 valid_mask = ~0;
+	uint8_t *p = data;
+	uint64_t valid_mask = ~0;
 
 	if (size <= 10)
 		return;
@@ -218,7 +218,7 @@ lzx_e8_filter(u8 *data, u32 size, u32 chunk_offset, u32 e8_file_size,
 		}
 		p++;
 		valid_mask >>= 1;
-		valid_mask |= (u64)1 << 63;
+		valid_mask |= (uint64_t)1 << 63;
 	}
 
 	if (data + size - p >= 64) {
@@ -230,13 +230,13 @@ lzx_e8_filter(u8 *data, u32 size, u32 chunk_offset, u32 e8_file_size,
 		 * positioned so that it will never be changed by a previous
 		 * translation before it is detected.  */
 
-		u8 *trap = p + ((data + size - p) & ~31) - 32 + 4;
-		u8 saved_byte = *trap;
+		uint8_t *trap = p + ((data + size - p) & ~31) - 32 + 4;
+		uint8_t saved_byte = *trap;
 		*trap = 0xE8;
 
 		for (;;) {
-			u32 e8_mask;
-			u8 *orig_p = p;
+			uint32_t e8_mask;
+			uint8_t *orig_p = p;
 		#ifdef __AVX2__
 			const __m256i e8_bytes = _mm256_set1_epi8(0xE8);
 			for (;;) {
@@ -256,8 +256,8 @@ lzx_e8_filter(u8 *data, u32 size, u32 chunk_offset, u32 e8_file_size,
 				__m128i bytes2 = *(const __m128i *)(p + 16);
 				__m128i cmpresult1 = _mm_cmpeq_epi8(bytes1, e8_bytes);
 				__m128i cmpresult2 = _mm_cmpeq_epi8(bytes2, e8_bytes);
-				u32 mask1 = _mm_movemask_epi8(cmpresult1);
-				u32 mask2 = _mm_movemask_epi8(cmpresult2);
+				uint32_t mask1 = _mm_movemask_epi8(cmpresult1);
+				uint32_t mask2 = _mm_movemask_epi8(cmpresult2);
 				/* The masks have a bit set for each E8 byte.
 				 * We stay in this fast inner loop as long as
 				 * there are no E8 bytes.  */
@@ -285,7 +285,7 @@ lzx_e8_filter(u8 *data, u32 size, u32 chunk_offset, u32 e8_file_size,
 				(*process_target)(p + bit + 1,
 						  p + bit - data + chunk_offset,
 						  e8_file_size);
-				valid_mask &= ~((u64)0x1F << bit);
+				valid_mask &= ~((uint64_t)0x1F << bit);
 			}
 
 			valid_mask >>= 32;
@@ -305,20 +305,20 @@ lzx_e8_filter(u8 *data, u32 size, u32 chunk_offset, u32 e8_file_size,
 		}
 		p++;
 		valid_mask >>= 1;
-		valid_mask |= (u64)1 << 63;
+		valid_mask |= (uint64_t)1 << 63;
 	}
 #endif /* __SSE2__ || __AVX2__ */
 }
 
 void
-lzx_preprocess(u8 *data, u32 size, u32 chunk_offset, u32 e8_file_size)
+lzx_preprocess(uint8_t *data, uint32_t size, uint32_t chunk_offset, uint32_t e8_file_size)
 {
 	lzx_e8_filter(data, size, chunk_offset, e8_file_size,
 		      do_translate_target);
 }
 
 void
-lzx_postprocess(u8 *data, u32 size, u32 chunk_offset, u32 e8_file_size)
+lzx_postprocess(uint8_t *data, uint32_t size, uint32_t chunk_offset, uint32_t e8_file_size)
 {
 	lzx_e8_filter(data, size, chunk_offset, e8_file_size,
 		      undo_translate_target);

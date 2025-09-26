@@ -85,10 +85,10 @@
 struct lz_match {
 
 	/* The number of bytes matched.  */
-	u32 length;
+	uint32_t length;
 
 	/* The offset back from the current position that was matched.  */
-	u32 offset;
+	uint32_t offset;
 };
 
 #endif /* _LIBLZX_BT_MATCHFINDER_H */
@@ -161,13 +161,13 @@ TEMPLATED(bt_matchfinder_init)(struct TEMPLATED(bt_matchfinder) *mf)
 }
 
 static attrib_forceinline mf_pos_t *
-TEMPLATED(bt_left_child)(struct TEMPLATED(bt_matchfinder) *mf, u32 node)
+TEMPLATED(bt_left_child)(struct TEMPLATED(bt_matchfinder) *mf, uint32_t node)
 {
 	return &mf->child_tab[(node << 1) + 0];
 }
 
 static attrib_forceinline mf_pos_t *
-TEMPLATED(bt_right_child)(struct TEMPLATED(bt_matchfinder) *mf, u32 node)
+TEMPLATED(bt_right_child)(struct TEMPLATED(bt_matchfinder) *mf, uint32_t node)
 {
 	return &mf->child_tab[(node << 1) + 1];
 }
@@ -181,38 +181,38 @@ TEMPLATED(bt_right_child)(struct TEMPLATED(bt_matchfinder) *mf, u32 node)
  * matches.  @record_matches should be a compile-time constant.  */
 static attrib_forceinline struct lz_match *
 TEMPLATED(bt_matchfinder_advance_one_byte)(struct TEMPLATED(bt_matchfinder) * const mf,
-					   const u8 * const in_begin,
+					   const uint8_t * const in_begin,
 					   mf_pos_t in_min_pos,
 					   const ptrdiff_t cur_pos,
-					   const u32 max_find_len,
-					   const u32 max_produce_len,
-					   const u32 nice_len,
-					   const u32 max_search_depth,
-					   u32 * const next_hashes,
-					   u32 * const best_len_ret,
+					   const uint32_t max_find_len,
+					   const uint32_t max_produce_len,
+					   const uint32_t nice_len,
+					   const uint32_t max_search_depth,
+					   uint32_t * const next_hashes,
+					   uint32_t * const best_len_ret,
 					   struct lz_match *lz_matchptr,
 					   const bool record_matches)
 {
-	const u8 *in_next = in_begin + cur_pos;
-	u32 depth_remaining = max_search_depth;
-	u32 next_hashseq;
-	u32 hash3;
-	u32 hash4;
+	const uint8_t *in_next = in_begin + cur_pos;
+	uint32_t depth_remaining = max_search_depth;
+	uint32_t next_hashseq;
+	uint32_t hash3;
+	uint32_t hash4;
 #ifdef BT_MATCHFINDER_HASH2_ORDER
-	u16 seq2;
-	u32 hash2;
+	uint16_t seq2;
+	uint32_t hash2;
 #endif
 	STATIC_ASSERT(BT_MATCHFINDER_HASH3_WAYS >= 1 &&
 		      BT_MATCHFINDER_HASH3_WAYS <= 2);
-	u32 cur_node;
+	uint32_t cur_node;
 #if BT_MATCHFINDER_HASH3_WAYS >= 2
-	u32 cur_node_2;
+	uint32_t cur_node_2;
 #endif
-	const u8 *matchptr;
+	const uint8_t *matchptr;
 	mf_pos_t *pending_lt_ptr, *pending_gt_ptr;
-	u32 best_lt_len, best_gt_len;
-	u32 len;
-	u32 best_len = 3;
+	uint32_t best_lt_len, best_gt_len;
+	uint32_t len;
+	uint32_t best_len = 3;
 
 	next_hashseq = get_unaligned_le32(in_next + 1);
 
@@ -247,7 +247,7 @@ TEMPLATED(bt_matchfinder_advance_one_byte)(struct TEMPLATED(bt_matchfinder) * co
 #endif
 	if (record_matches &&
 	    TEMPLATED(matchfinder_is_valid_pos)(cur_node, in_min_pos)) {
-		u32 seq3 = load_u24_unaligned(in_next);
+		uint32_t seq3 = load_u24_unaligned(in_next);
 		if (seq3 == load_u24_unaligned(&in_begin[cur_node]) &&
 			likely(cur_node >= in_min_pos)) {
 			lz_matchptr->length = 3;
@@ -375,15 +375,15 @@ TEMPLATED(bt_matchfinder_advance_one_byte)(struct TEMPLATED(bt_matchfinder) * co
  */
 static attrib_forceinline struct lz_match *
 TEMPLATED(bt_matchfinder_get_matches)(struct TEMPLATED(bt_matchfinder) *mf,
-				      const u8 *in_begin,
-				      u32 in_min_pos,
+				      const uint8_t *in_begin,
+				      uint32_t in_min_pos,
 				      ptrdiff_t cur_pos,
-				      u32 max_find_len,
-				      u32 max_produce_len,
-				      u32 nice_len,
-				      u32 max_search_depth,
-				      u32 next_hashes[2],
-				      u32 *best_len_ret,
+				      uint32_t max_find_len,
+				      uint32_t max_produce_len,
+				      uint32_t nice_len,
+				      uint32_t max_search_depth,
+				      uint32_t next_hashes[2],
+				      uint32_t *best_len_ret,
 				      struct lz_match *lz_matchptr)
 {
 	return TEMPLATED(bt_matchfinder_advance_one_byte)(mf,
@@ -408,14 +408,14 @@ TEMPLATED(bt_matchfinder_get_matches)(struct TEMPLATED(bt_matchfinder) *mf,
  */
 static attrib_forceinline void
 TEMPLATED(bt_matchfinder_skip_byte)(struct TEMPLATED(bt_matchfinder) *mf,
-				    const u8 *in_begin,
-				    u32 in_min_pos,
+				    const uint8_t *in_begin,
+				    uint32_t in_min_pos,
 				    ptrdiff_t cur_pos,
-				    u32 nice_len,
-				    u32 max_search_depth,
-				    u32 next_hashes[2])
+				    uint32_t nice_len,
+				    uint32_t max_search_depth,
+				    uint32_t next_hashes[2])
 {
-	u32 best_len;
+	uint32_t best_len;
 	TEMPLATED(bt_matchfinder_advance_one_byte)(mf,
 						   in_begin,
 						   in_min_pos,
@@ -436,7 +436,7 @@ TEMPLATED(bt_matchfinder_skip_byte)(struct TEMPLATED(bt_matchfinder) *mf,
  */
 static attrib_forceinline void
 TEMPLATED(bt_matchfinder_cull)(struct TEMPLATED(bt_matchfinder) * mf,
-			       u32 cull_size, u32 window_size)
+			       uint32_t cull_size, uint32_t window_size)
 {
 	size_t mf_size = TEMPLATED(bt_matchfinder_size)(window_size, true);
 

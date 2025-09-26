@@ -65,14 +65,14 @@ is_power_of_2(unsigned long n)
 
 }
 
-static inline u64
-hash_u64(u64 n)
+static inline uint64_t
+hash_u64(uint64_t n)
 {
 	return n * 0x9e37fffffffc0001ULL;
 }
 
 static inline int
-cmp_u32(u32 n1, u32 n2)
+cmp_u32(uint32_t n1, uint32_t n2)
 {
 	if (n1 < n2)
 		return -1;
@@ -82,7 +82,7 @@ cmp_u32(u32 n1, u32 n2)
 }
 
 static inline int
-cmp_u64(u64 n1, u64 n2)
+cmp_u64(uint64_t n1, uint64_t n2)
 {
 	if (n1 < n2)
 		return -1;
@@ -98,7 +98,7 @@ cmp_u64(u64 n1, u64 n2)
 unsigned
 get_available_cpus(void);
 
-u64
+uint64_t
 get_available_memory(void);
 
 #endif /* _LIBLZX_UTIL_H */
