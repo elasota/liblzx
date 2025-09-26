@@ -2013,36 +2013,6 @@ typedef struct fixed32_s {
  * version.  It does not need to be perfectly accurate because it is only used
  * for estimating symbol costs, which is very approximate anyway.
  */
-static int32_t
-log2f_fast_normalized(float x, int multiplier_bits)
-{
-        union {
-                float f;
-                int32_t i;
-        } u = { .f = x };
-
-        /* Extract the exponent and subtract 127 to remove the bias.  This gives
-         * the integer part of the result. */
-        float res = ((u.i >> 23) & 0xFF) - 127;
-
-        /* Set the exponent to 0 (plus bias of 127).  This transforms the number
-         * to the range [1, 2) while retaining the same mantissa. */
-        u.i = (u.i & ~(0xFF << 23)) | (127 << 23);
-
-        /*
-         * Approximate the log2 of the transformed number using a degree 2
-         * interpolating polynomial for log2(x) over the interval [1, 2).  Then
-         * add this to the extracted exponent to produce the final approximation
-         * of log2(x).
-         *
-         * The coefficients of the interpolating polynomial used here were found
-         * using the script tools/log2_interpolation.r.
-         */
-        res = res - 1.653124006f + u.f * (1.9941812f - u.f * 0.3347490189f);
-
-        return res * (1 << multiplier_bits);
-}
-
 struct log2_fixed_table_pair
 {
         uint32_t multiplier;
@@ -2796,7 +2766,7 @@ lzx_compress_near_optimal(struct liblzx_compressor * restrict c,
                 /* It's not time to end the block yet.  Compute the next pause
                  * point and resume matchfinding. */
                 next_pause_point =
-                        min_ptr(in_next + min_size(NUM_OBSERVATIONS_PER_BLOCK_CHECK * 2 -
+                        min_constptr(in_next + min_size(NUM_OBSERVATIONS_PER_BLOCK_CHECK * 2 -
                                             c->split_stats.num_new_observations,
                                           in_max_block_end - in_next),
                             in_max_block_end - min_size(LZX_MAX_MATCH_LEN - 1,
@@ -3487,7 +3457,7 @@ liblzx_compress_create(const struct liblzx_compress_properties *props)
         if (c->variant != LIBLZX_VARIANT_WIM)
                 c->out_buffer_capacity += 6144;
 
-        c->out_buffer = c->out_chunk.data =
+        c->out_chunk.data = c->out_buffer =
             props->alloc_func(props->userdata, c->out_buffer_capacity);
 
         if (!c->out_buffer)

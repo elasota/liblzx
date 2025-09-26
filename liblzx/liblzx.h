@@ -27,8 +27,6 @@
 #include "liblzx_error.h"
 
 typedef struct liblzx_internal liblzx_internal_t;
-typedef enum liblzx_result liblzx_result_t;
-typedef enum liblzx_variant liblzx_variant_t;
 typedef struct liblzx_compress_properties liblzx_compress_properties_t;
 typedef struct liblzx_compressor liblzx_compressor_t;
 typedef struct liblzx_output_chunk liblzx_output_chunk_t;
@@ -43,6 +41,8 @@ enum liblzx_variant {
         /* LZX variant used by WIM */
         LIBLZX_VARIANT_WIM,
 };
+
+typedef enum liblzx_variant liblzx_variant_t;
 
 enum liblzx_constant {
         LIBLZX_CONST_DEFAULT_CHUNK_SIZE = 32768,
