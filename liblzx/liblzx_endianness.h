@@ -32,7 +32,7 @@
 #include "liblzx_compiler.h"
 #include "liblzx_types.h"
 
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
 #include <intrin.h>
 #endif
 
@@ -69,7 +69,7 @@
 
 static attrib_forceinline uint16_t do_bswap16(uint16_t n)
 {
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
         return _byteswap_ushort(n);
 #elif GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
         return __builtin_bswap16(n);
@@ -80,7 +80,7 @@ static attrib_forceinline uint16_t do_bswap16(uint16_t n)
 
 static attrib_forceinline uint32_t do_bswap32(uint32_t n)
 {
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
         return _byteswap_ulong(n);
 #elif GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
         return __builtin_bswap32(n);
@@ -91,7 +91,7 @@ static attrib_forceinline uint32_t do_bswap32(uint32_t n)
 
 static attrib_forceinline uint64_t do_bswap64(uint64_t n)
 {
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
         return _byteswap_uint64(n);
 #elif GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
         return __builtin_bswap64(n);

@@ -32,7 +32,7 @@
 #include "liblzx_compiler.h"
 #include "liblzx_types.h"
 
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
 #include <intrin.h>
 #endif
 
@@ -45,7 +45,7 @@
 static attrib_forceinline unsigned
 bsr32(uint32_t v)
 {
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
         unsigned long result;
         _BitScanReverse(&result, v);
         return result;
@@ -57,7 +57,7 @@ bsr32(uint32_t v)
 static attrib_forceinline unsigned
 bsr64(uint64_t v)
 {
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
 #  ifdef _M_AMD64
         unsigned long result;
         _BitScanReverse64(&result, v);
@@ -95,7 +95,7 @@ bsrw(machine_word_t v)
 static attrib_forceinline unsigned
 bsf32(uint32_t v)
 {
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
         unsigned long result;
         _BitScanForward(&result, v);
         return result;
@@ -107,7 +107,7 @@ bsf32(uint32_t v)
 static attrib_forceinline unsigned
 bsf64(uint64_t v)
 {
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
 #  ifdef _M_AMD64
         unsigned long result;
         _BitScanForward64(&result, v);

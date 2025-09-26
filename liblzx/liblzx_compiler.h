@@ -31,7 +31,7 @@
 #ifndef _LIBLZX_COMPILER_H
 #define _LIBLZX_COMPILER_H
 
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
 #include <stdint.h>
 
 #pragma warning(error:4013)
@@ -54,9 +54,15 @@
          (__GNUC__ > major ||                                                \
           (__GNUC__ == major && __GNUC_MINOR__ >= minor)))
 
+#if defined(_MSC_VER) && !defined(__clang__) && !defined(__GNUC__)
+#define LIBLZX_IS_MSVC_COMPILER 1
+#else
+#define LIBLZX_IS_MSVC_COMPILER 0
+#endif
+
 /* Feature-test macros defined by recent versions of clang.  */
 #ifndef __has_attribute
-#  define __has_attribute(attribute)        0
+#  define __has_attribute(attribute)    0
 #endif
 #ifndef __has_feature
 #  define __has_feature(feature)        0
@@ -67,28 +73,28 @@
 
 /* Declare that the annotated function should always be inlined.  This might be
  * desirable in highly tuned code, e.g. compression codecs.  */
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
 #define attrib_forceinline        __forceinline
 #else
 #define attrib_forceinline        inline __attribute__((always_inline))
 #endif
 
 /* Declare that the annotated function should *not* be inlined.  */
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
 #define attrib_noinline                __declspec(noinline)
 #else
 #define attrib_noinline                __attribute__((noinline))
 #endif
 
 /* Declare that the annotated function is unlikely to be executed */
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
 #define attrib_cold
 #else
 #define attrib_cold __attribute__((cold))
 #endif
 
 /* Declare that the annotated type or variable is aligned */
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
 #define attrib_aligned(alignment)        __declspec(align(alignment))
 #else
 #define attrib_aligned(alignment)        __attribute__((aligned(alignment)))
@@ -100,28 +106,28 @@
 #define attrib_noinline_for_stack attrib_noinline
 
 /* Hint that the expression is usually true.  */
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
 #define likely(expr)                (expr)
 #else
 #define likely(expr)                __builtin_expect(!!(expr), 1)
 #endif
 
 /* Hint that the expression is usually false.  */
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
 #define unlikely(expr)                (expr)
 #else
 #define unlikely(expr)                __builtin_expect(!!(expr), 0)
 #endif
 
 /* Prefetch into L1 cache for read.  */
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
 #define prefetchr(addr)                _mm_prefetch((const char *)(addr), _MM_HINT_T0)
 #else
 #define prefetchr(addr)                __builtin_prefetch((addr), 0)
 #endif
 
 /* Prefetch into L1 cache for write.  */
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
 #define prefetchw(addr)                _mm_prefetch((const char *)(addr), _MM_HINT_T0)
 #else
 #define prefetchw(addr)                __builtin_prefetch((addr), 1)
@@ -164,7 +170,7 @@
 
 /* Swap the values of two variables, without multiple evaluation.  */
 #ifndef swap
-#  ifdef _MSC_VER
+#  if LIBLZX_IS_MSVC_COMPILER
 #    define swap(a, b) do { typeof(a) _a = (a); (a) = (b); (b) = _a; } while(0)
 #  else
 #    define swap(a, b) ({ typeof(a) _a = (a); (a) = (b); (b) = _a; })
@@ -199,7 +205,7 @@
 /* CONCAT() - concatenate two tokens at preprocessing time.  */
 #define CONCAT(s1, s2)                CONCAT_IMPL(s1, s2)
 
-#ifdef _MSC_VER
+#if LIBLZX_IS_MSVC_COMPILER
 #define __builtin_constant_p(n) (0)
 
 typedef ptrdiff_t ssize_t;
