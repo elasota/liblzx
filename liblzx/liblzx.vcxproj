@@ -139,6 +139,7 @@
     <ClInclude Include="lzx_common.h" />
     <ClInclude Include="lzx_constants.h" />
     <ClInclude Include="matchfinder_common.h" />
+    <ClInclude Include="minmax.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="unaligned.h" />
     <ClInclude Include="util.h" />

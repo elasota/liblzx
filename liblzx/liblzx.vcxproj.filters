@@ -60,6 +60,9 @@
     <ClInclude Include="matchfinder_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="minmax.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lzx_common.c">
