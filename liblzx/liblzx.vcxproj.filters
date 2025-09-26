@@ -21,57 +21,57 @@
     <ClInclude Include="liblzx_config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bitops.h">
+    <ClInclude Include="liblzx_bitops.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bt_matchfinder.h">
+    <ClInclude Include="liblzx_bt_matchfinder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="compiler.h">
+    <ClInclude Include="liblzx_compiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="compress_common.h">
+    <ClInclude Include="liblzx_compress_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="endianness.h">
+    <ClInclude Include="liblzx_endianness.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="error.h">
+    <ClInclude Include="liblzx_error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="hc_matchfinder.h">
+    <ClInclude Include="liblzx_hc_matchfinder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lzx_common.h">
+    <ClInclude Include="liblzx_lzx_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lzx_constants.h">
+    <ClInclude Include="liblzx_lzx_constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="types.h">
+    <ClInclude Include="liblzx_types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="unaligned.h">
+    <ClInclude Include="liblzx_unaligned.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util.h">
+    <ClInclude Include="liblzx_util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="matchfinder_common.h">
+    <ClInclude Include="liblzx_matchfinder_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="minmax.h">
+    <ClInclude Include="liblzx_minmax.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="lzx_common.c">
+    <ClCompile Include="liblzx_lzx_common.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lzx_compress.c">
+    <ClCompile Include="liblzx_lzx_compress.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="compress_common.c">
+    <ClCompile Include="liblzx_compress_common.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

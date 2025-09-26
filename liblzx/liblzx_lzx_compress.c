@@ -180,12 +180,12 @@
 #  include "config.h"
 #endif
 
-#include "compress_common.h"
-#include "error.h"
-#include "lzx_common.h"
-#include "minmax.h"
-#include "unaligned.h"
-#include "util.h"
+#include "liblzx_compress_common.h"
+#include "liblzx_error.h"
+#include "liblzx_lzx_common.h"
+#include "liblzx_minmax.h"
+#include "liblzx_unaligned.h"
+#include "liblzx_util.h"
 #include "liblzx.h"
 
 #include <assert.h>
@@ -197,8 +197,8 @@
 #define mf_pos_t        uint16_t
 #define MF_SUFFIX        _16
 #define MF_INVALID_POS        (0xFFFFu)
-#include "bt_matchfinder.h"
-#include "hc_matchfinder.h"
+#include "liblzx_bt_matchfinder.h"
+#include "liblzx_hc_matchfinder.h"
 
 /* Matchfinders with 32-bit positions */
 #undef mf_pos_t
@@ -207,8 +207,8 @@
 #define mf_pos_t        uint32_t
 #define MF_SUFFIX        _32
 #define MF_INVALID_POS        (0xFFFFFFFFu)
-#include "bt_matchfinder.h"
-#include "hc_matchfinder.h"
+#include "liblzx_bt_matchfinder.h"
+#include "liblzx_hc_matchfinder.h"
 
 #undef mf_pos_t
 #undef MF_SUFFIX

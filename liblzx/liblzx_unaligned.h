@@ -31,9 +31,9 @@
 
 #include <string.h>
 
-#include "compiler.h"
-#include "endianness.h"
-#include "types.h"
+#include "liblzx_compiler.h"
+#include "liblzx_endianness.h"
+#include "liblzx_types.h"
 
 #define DEFINE_UNALIGNED_TYPE(name, type)                        \
 static attrib_forceinline type                                   \

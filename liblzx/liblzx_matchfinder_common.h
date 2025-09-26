@@ -29,8 +29,8 @@
 #ifndef _LIBLZX_MATCHFINDER_COMMON_H
 #define _LIBLZX_MATCHFINDER_COMMON_H
 
-#include "bitops.h"
-#include "unaligned.h"
+#include "liblzx_bitops.h"
+#include "liblzx_unaligned.h"
 
 /*
  * Given a 32-bit value that was loaded with the platform's native endianness,

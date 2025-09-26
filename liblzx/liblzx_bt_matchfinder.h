@@ -66,7 +66,7 @@
 
 #include <string.h>
 
-#include "matchfinder_common.h"
+#include "liblzx_matchfinder_common.h"
 
 #define BT_MATCHFINDER_HASH3_ORDER 15
 #define BT_MATCHFINDER_HASH3_WAYS  2

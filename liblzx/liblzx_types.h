@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "compiler.h"
+#include "liblzx_compiler.h"
 
 /* Unsigned little endian types of exact size */
 typedef uint16_t _bitwise_attr le16_t;

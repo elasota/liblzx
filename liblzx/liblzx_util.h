@@ -4,8 +4,8 @@
 #ifndef _LIBLZX_UTIL_H
 #define _LIBLZX_UTIL_H
 
-#include "compiler.h"
-#include "types.h"
+#include "liblzx_compiler.h"
+#include "liblzx_types.h"
 
 /****************
  * General macros

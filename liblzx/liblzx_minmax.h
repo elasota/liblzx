@@ -30,8 +30,8 @@
 #ifndef _LIBLZX_MINMAX_H
 #define _LIBLZX_MINMAX_H
 
-#include "compiler.h"
-#include "types.h"
+#include "liblzx_compiler.h"
+#include "liblzx_types.h"
 
 /* Get the minimum of two variables, without multiple evaluation.  */
 static attrib_forceinline double

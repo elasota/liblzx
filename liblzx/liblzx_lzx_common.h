@@ -7,8 +7,8 @@
 #ifndef _LZX_COMMON_H
 #define _LZX_COMMON_H
 
-#include "lzx_constants.h"
-#include "types.h"
+#include "liblzx_lzx_constants.h"
+#include "liblzx_types.h"
 
 extern const int32_t lzx_offset_slot_base[LZX_MAX_OFFSET_SLOTS + 1];
 

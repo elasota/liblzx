@@ -24,7 +24,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "error.h"
+#include "liblzx_error.h"
 
 typedef struct liblzx_internal liblzx_internal_t;
 typedef enum liblzx_result liblzx_result_t;

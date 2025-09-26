@@ -127,27 +127,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="bitops.h" />
-    <ClInclude Include="bt_matchfinder.h" />
-    <ClInclude Include="compiler.h" />
-    <ClInclude Include="compress_common.h" />
-    <ClInclude Include="endianness.h" />
-    <ClInclude Include="error.h" />
-    <ClInclude Include="hc_matchfinder.h" />
+    <ClInclude Include="liblzx_bitops.h" />
+    <ClInclude Include="liblzx_bt_matchfinder.h" />
+    <ClInclude Include="liblzx_compiler.h" />
+    <ClInclude Include="liblzx_compress_common.h" />
+    <ClInclude Include="liblzx_endianness.h" />
+    <ClInclude Include="liblzx_error.h" />
+    <ClInclude Include="liblzx_hc_matchfinder.h" />
     <ClInclude Include="liblzx.h" />
     <ClInclude Include="liblzx_config.h" />
-    <ClInclude Include="lzx_common.h" />
-    <ClInclude Include="lzx_constants.h" />
-    <ClInclude Include="matchfinder_common.h" />
-    <ClInclude Include="minmax.h" />
-    <ClInclude Include="types.h" />
-    <ClInclude Include="unaligned.h" />
-    <ClInclude Include="util.h" />
+    <ClInclude Include="liblzx_lzx_common.h" />
+    <ClInclude Include="liblzx_lzx_constants.h" />
+    <ClInclude Include="liblzx_matchfinder_common.h" />
+    <ClInclude Include="liblzx_minmax.h" />
+    <ClInclude Include="liblzx_types.h" />
+    <ClInclude Include="liblzx_unaligned.h" />
+    <ClInclude Include="liblzx_util.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="compress_common.c" />
-    <ClCompile Include="lzx_common.c" />
-    <ClCompile Include="lzx_compress.c" />
+    <ClCompile Include="liblzx_compress_common.c" />
+    <ClCompile Include="liblzx_lzx_common.c" />
+    <ClCompile Include="liblzx_lzx_compress.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

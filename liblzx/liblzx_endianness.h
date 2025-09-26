@@ -29,8 +29,8 @@
 #ifndef _LIBLZX_ENDIANNESS_H
 #define _LIBLZX_ENDIANNESS_H
 
-#include "compiler.h"
-#include "types.h"
+#include "liblzx_compiler.h"
+#include "liblzx_types.h"
 
 #ifdef _MSC_VER
 #include <intrin.h>

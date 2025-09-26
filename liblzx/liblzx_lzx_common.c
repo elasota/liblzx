@@ -24,7 +24,7 @@
 #  include "config.h"
 #endif
 
-#include "minmax.h"
+#include "liblzx_minmax.h"
 
 #include <string.h>
 
@@ -36,11 +36,11 @@
 #  include <immintrin.h>
 #endif
 
-#include "bitops.h"
-#include "endianness.h"
-#include "lzx_common.h"
-#include "unaligned.h"
-#include "util.h"
+#include "liblzx_bitops.h"
+#include "liblzx_endianness.h"
+#include "liblzx_lzx_common.h"
+#include "liblzx_unaligned.h"
+#include "liblzx_util.h"
 
 /* Mapping: offset slot => first match offset that uses that offset slot.
  * The offset slots for repeat offsets map to "fake" offsets < 1.  */

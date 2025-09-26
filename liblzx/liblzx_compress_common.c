@@ -35,9 +35,9 @@
 #include <string.h>
 
 #include <assert.h>
-#include "compress_common.h"
-#include "minmax.h"
-#include "util.h"
+#include "liblzx_compress_common.h"
+#include "liblzx_minmax.h"
+#include "liblzx_util.h"
 
 /*
  * Given the binary tree node A[subtree_idx] whose children already satisfy the

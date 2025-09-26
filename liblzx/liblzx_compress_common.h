@@ -7,7 +7,7 @@
 #ifndef _LIBLZX_COMPRESS_COMMON_H
 #define _LIBLZX_COMPRESS_COMMON_H
 
-#include "types.h"
+#include "liblzx_types.h"
 
 #define MAX_NUM_SYMS            799        /* LZMS_MAX_NUM_SYMS */
 #define MAX_CODEWORD_LEN        16
