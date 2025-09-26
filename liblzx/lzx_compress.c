@@ -3613,7 +3613,6 @@ lzx_compress_chunk(struct liblzx_compressor *c)
 	return result;
 }
 
-// Destroys a compressor object and releases all resources.
 void
 liblzx_compress_destroy(liblzx_compressor_t *c)
 {
