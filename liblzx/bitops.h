@@ -26,8 +26,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _WIMLIB_BITOPS_H
-#define _WIMLIB_BITOPS_H
+#ifndef _LIBLZX_BITOPS_H
+#define _LIBLZX_BITOPS_H
 
 #include "compiler.h"
 #include "types.h"
@@ -153,4 +153,4 @@ roundup_pow_of_2(size_t n)
 	return (size_t)1 << ilog2_ceil(n);
 }
 
-#endif /* _WIMLIB_BITOPS_H */
+#endif /* _LIBLZX_BITOPS_H */

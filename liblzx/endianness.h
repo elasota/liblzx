@@ -26,8 +26,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _WIMLIB_ENDIANNESS_H
-#define _WIMLIB_ENDIANNESS_H
+#ifndef _LIBLZX_ENDIANNESS_H
+#define _LIBLZX_ENDIANNESS_H
 
 #include "compiler.h"
 #include "types.h"
@@ -133,4 +133,4 @@ static attrib_forceinline u64 do_bswap64(u64 n)
 #endif
 
 #endif /* _NTFS_ENDIANS_H */
-#endif /* _WIMLIB_ENDIANNESS_H */
+#endif /* _LIBLZX_ENDIANNESS_H */

@@ -130,7 +130,6 @@
     <ClInclude Include="bitops.h" />
     <ClInclude Include="bt_matchfinder.h" />
     <ClInclude Include="compiler.h" />
-    <ClInclude Include="compressor_ops.h" />
     <ClInclude Include="compress_common.h" />
     <ClInclude Include="endianness.h" />
     <ClInclude Include="error.h" />

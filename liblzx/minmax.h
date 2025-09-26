@@ -119,9 +119,4 @@ max_constptr(const void *a, const void *b)
 	return (a > b) ? a : b;
 }
 
-/* Get the maximum of three variables, without multiple evaluation.  */
-#define max3_signed(a, b, c)   max_signed(max_signed((a), (b)), (c))
-#define max3_unsigned(a, b, c) max_unsigned(max_unsigned((a), (b)), (c))
-#define max3_float(a, b, c)    max_float(max_float((a), (b)), (c))
-
 #endif

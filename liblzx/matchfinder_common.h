@@ -26,8 +26,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _WIMLIB_MATCHFINDER_COMMON_H
-#define _WIMLIB_MATCHFINDER_COMMON_H
+#ifndef _LIBLZX_MATCHFINDER_COMMON_H
+#define _LIBLZX_MATCHFINDER_COMMON_H
 
 #include "bitops.h"
 #include "unaligned.h"
@@ -128,4 +128,4 @@ word_differs:
 	return len;
 }
 
-#endif /* _WIMLIB_MATCHFINDER_COMMON_H */
+#endif /* _LIBLZX_MATCHFINDER_COMMON_H */

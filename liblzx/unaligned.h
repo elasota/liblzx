@@ -26,8 +26,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _WIMLIB_UNALIGNED_H
-#define _WIMLIB_UNALIGNED_H
+#ifndef _LIBLZX_UNALIGNED_H
+#define _LIBLZX_UNALIGNED_H
 
 #include <string.h>
 
@@ -131,4 +131,4 @@ put_unaligned_be32(u32 v, u8 *p)
 	}
 }
 
-#endif /* _WIMLIB_UNALIGNED_H */
+#endif /* _LIBLZX_UNALIGNED_H */

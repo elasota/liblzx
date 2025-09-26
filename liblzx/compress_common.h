@@ -4,8 +4,8 @@
  * Header for compression code shared by multiple compression formats.
  */
 
-#ifndef _WIMLIB_COMPRESS_COMMON_H
-#define _WIMLIB_COMPRESS_COMMON_H
+#ifndef _LIBLZX_COMPRESS_COMMON_H
+#define _LIBLZX_COMPRESS_COMMON_H
 
 #include "types.h"
 
@@ -16,4 +16,4 @@ void
 make_canonical_huffman_code(unsigned num_syms, unsigned max_codeword_len,
 			    const u32 freqs[], u8 lens[], u32 codewords[]);
 
-#endif /* _WIMLIB_COMPRESS_COMMON_H */
+#endif /* _LIBLZX_COMPRESS_COMMON_H */

@@ -33,9 +33,6 @@
     <ClInclude Include="compress_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="compressor_ops.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="endianness.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -181,7 +181,6 @@
 #endif
 
 #include "compress_common.h"
-#include "compressor_ops.h"
 #include "error.h"
 #include "lzx_common.h"
 #include "minmax.h"

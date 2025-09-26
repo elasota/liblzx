@@ -1,5 +1,5 @@
-#ifndef _WIMLIB_TYPES_H
-#define _WIMLIB_TYPES_H
+#ifndef _LIBLZX_TYPES_H
+#define _LIBLZX_TYPES_H
 
 #include <inttypes.h>
 #include <stdbool.h>
@@ -34,11 +34,6 @@ typedef uint64_t _bitwise_attr be64;
 /* A pointer to 'utf16lechar' indicates a UTF-16LE encoded string */
 typedef le16 utf16lechar;
 
-#ifndef WIMLIB_WIMSTRUCT_DECLARED
-typedef struct WIMStruct WIMStruct;
-#  define WIMLIB_WIMSTRUCT_DECLARED
-#endif
-
 /*
  * Type of a machine word.  'unsigned long' would be logical, but that is only
  * 32 bits on x86_64 Windows.  The same applies to 'uint_fast32_t'.  So the best
@@ -49,4 +44,4 @@ typedef size_t machine_word_t;
 #define WORDBYTES	sizeof(machine_word_t)
 #define WORDBITS	(8 * WORDBYTES)
 
-#endif /* _WIMLIB_TYPES_H */
+#endif /* _LIBLZX_TYPES_H */

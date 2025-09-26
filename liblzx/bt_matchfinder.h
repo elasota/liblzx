@@ -76,8 +76,8 @@
 #undef TEMPLATED
 #define TEMPLATED(name)		CONCAT(name, MF_SUFFIX)
 
-#ifndef _WIMLIB_BT_MATCHFINDER_H
-#define _WIMLIB_BT_MATCHFINDER_H
+#ifndef _LIBLZX_BT_MATCHFINDER_H
+#define _LIBLZX_BT_MATCHFINDER_H
 
 /* Non-templated definitions  */
 
@@ -91,7 +91,7 @@ struct lz_match {
 	u32 offset;
 };
 
-#endif /* _WIMLIB_BT_MATCHFINDER_H */
+#endif /* _LIBLZX_BT_MATCHFINDER_H */
 
 struct TEMPLATED(bt_matchfinder) {
 

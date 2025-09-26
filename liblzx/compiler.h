@@ -28,8 +28,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _WIMLIB_COMPILER_H
-#define _WIMLIB_COMPILER_H
+#ifndef _LIBLZX_COMPILER_H
+#define _LIBLZX_COMPILER_H
 
 #ifdef _MSC_VER
 #include <stdint.h>
@@ -205,4 +205,4 @@
 typedef ptrdiff_t ssize_t;
 #endif
 
-#endif /* _WIMLIB_COMPILER_H */
+#endif /* _LIBLZX_COMPILER_H */

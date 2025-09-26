@@ -1,8 +1,8 @@
 /*
  * util.h - utility functions and macros
  */
-#ifndef _WIMLIB_UTIL_H
-#define _WIMLIB_UTIL_H
+#ifndef _LIBLZX_UTIL_H
+#define _LIBLZX_UTIL_H
 
 #include "compiler.h"
 #include "types.h"
@@ -101,4 +101,4 @@ get_available_cpus(void);
 u64
 get_available_memory(void);
 
-#endif /* _WIMLIB_UTIL_H */
+#endif /* _LIBLZX_UTIL_H */
