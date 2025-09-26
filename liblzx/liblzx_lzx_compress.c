@@ -1872,9 +1872,9 @@ lzx_find_min_cost_path(struct liblzx_compressor * const restrict c,
                                                                                  LZX_MAX_MATCH_LEN));
                                                         unsigned rep0_len = lz_extend(strptr, matchptr, 2, limit);
                                                         uint8_t lit = strptr[-1];
+                                                        unsigned total_len = next_len + rep0_len;
                                                         cost += c->costs.main[lit] +
                                                                 c->costs.match_cost[0][rep0_len - LZX_MIN_MATCH_LEN];
-                                                        unsigned total_len = next_len + rep0_len;
                                                         if (cost < (cur_node + total_len)->cost) {
                                                                 (cur_node + total_len)->cost = cost;
                                                                 (cur_node + total_len)->item =
@@ -2334,11 +2334,6 @@ fixed_set_fraction(fixed32frac *result, uint32_t num, uint32_t denom)
 }
 
 static void
-fixed_mul(fixed32 *result, const fixed32 *a, const fixed32 *b)
-{
-}
-
-static void
 fixed_mul_uint_frac(fixed32 *result, uint32_t a, const fixed32frac *b)
 {
         result->value = ((uint64_t)a) * (uint64_t)b->value;
@@ -2581,7 +2576,6 @@ lzx_compress_near_optimal(struct liblzx_compressor * restrict c,
                           struct lzx_output_bitstream * restrict os,
                           bool is_16_bit)
 {
-        uint32_t prefix_size                 = c->in_prefix_size;
         uint32_t max_offset                 = c->window_size;
         const uint8_t *         in_next = in_begin;
         const uint8_t * const in_chunk_end = in_begin + in_nchunk;
@@ -3010,7 +3004,6 @@ lzx_compress_lazy(struct liblzx_compressor * restrict c,
                   size_t in_ndata, struct lzx_output_bitstream * restrict os,
                   bool is_16_bit)
 {
-        uint32_t prefix_size                 = c->in_prefix_size;
         uint32_t max_offset                 = c->window_size;
         const uint8_t *         in_next = in_begin;
         const uint8_t * const in_chunk_end = in_begin + in_nchunk;
@@ -3066,8 +3059,6 @@ lzx_compress_lazy(struct liblzx_compressor * restrict c,
                 lzx_init_block_split_stats(&c->split_stats);
 
                 do {
-                        unsigned dist = in_chunk_end - in_next;
-
                         /* Adjust max_len and nice_len if we're nearing the end
                          * of the input buffer. */
                         if (unlikely(max_produce_len >
@@ -3595,8 +3586,6 @@ size_t
 liblzx_compress_add_input(liblzx_compressor_t *c, const void *in_data,
                           size_t in_data_size)
 {
-        uint32_t goal_used = 0;
-        uint32_t goal_fill = 0;
         uint32_t max_used = 0;
         size_t fill_amount = 0;
 
