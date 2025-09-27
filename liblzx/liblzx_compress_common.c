@@ -602,7 +602,7 @@ make_canonical_huffman_code(unsigned num_syms, unsigned max_codeword_len,
         unsigned num_used_syms;
 
         assert(num_syms <= MAX_NUM_SYMS);
-        STATIC_ASSERT(MAX_NUM_SYMS <= 1 << NUM_SYMBOL_BITS);
+        STATIC_ASSERT_STMT(MAX_NUM_SYMS <= 1 << NUM_SYMBOL_BITS);
         assert(max_codeword_len <= MAX_CODEWORD_LEN);
 
         /*

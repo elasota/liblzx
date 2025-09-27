@@ -756,7 +756,7 @@ lzx_build_huffman_codes(struct liblzx_compressor *c)
         const struct lzx_freqs *freqs = &c->freqs;
         struct lzx_codes *codes = &c->codes[c->codes_index];
 
-        STATIC_ASSERT(MAIN_CODEWORD_LIMIT >= 9 &&
+        STATIC_ASSERT_STMT(MAIN_CODEWORD_LIMIT >= 9 &&
                       MAIN_CODEWORD_LIMIT <= LZX_MAX_MAIN_CODEWORD_LEN);
         make_canonical_huffman_code(c->num_main_syms,
                                     MAIN_CODEWORD_LIMIT,
@@ -764,7 +764,7 @@ lzx_build_huffman_codes(struct liblzx_compressor *c)
                                     codes->lens.main,
                                     codes->codewords.main);
 
-        STATIC_ASSERT(LENGTH_CODEWORD_LIMIT >= 8 &&
+        STATIC_ASSERT_STMT(LENGTH_CODEWORD_LIMIT >= 8 &&
                       LENGTH_CODEWORD_LIMIT <= LZX_MAX_LEN_CODEWORD_LEN);
         make_canonical_huffman_code(LZX_LENCODE_NUM_SYMBOLS,
                                     LENGTH_CODEWORD_LIMIT,
@@ -772,7 +772,8 @@ lzx_build_huffman_codes(struct liblzx_compressor *c)
                                     codes->lens.len,
                                     codes->codewords.len);
 
-        STATIC_ASSERT(ALIGNED_CODEWORD_LIMIT >= LZX_NUM_ALIGNED_OFFSET_BITS &&
+        STATIC_ASSERT_STMT(
+            ALIGNED_CODEWORD_LIMIT >= LZX_NUM_ALIGNED_OFFSET_BITS &&
                       ALIGNED_CODEWORD_LIMIT <= LZX_MAX_ALIGNED_CODEWORD_LEN);
         make_canonical_huffman_code(LZX_ALIGNEDCODE_NUM_SYMBOLS,
                                     ALIGNED_CODEWORD_LIMIT,
@@ -944,7 +945,7 @@ lzx_write_compressed_code(struct lzx_output_bitstream *os,
                                                       precode_items);
 
         /* Build the precode.  */
-        STATIC_ASSERT(PRE_CODEWORD_LIMIT >= 5 &&
+        STATIC_ASSERT_STMT(PRE_CODEWORD_LIMIT >= 5 &&
                       PRE_CODEWORD_LIMIT <= LZX_MAX_PRE_CODEWORD_LEN);
         make_canonical_huffman_code(LZX_PRECODE_NUM_SYMBOLS, PRE_CODEWORD_LIMIT,
                                     precode_freqs, precode_lens,
@@ -972,7 +973,7 @@ lzx_write_compressed_code(struct lzx_output_bitstream *os,
                                              precode_lens[precode_sym]);
                         }
                 }
-                STATIC_ASSERT(CAN_BUFFER(2 * PRE_CODEWORD_LIMIT + 1));
+                STATIC_ASSERT_STMT(CAN_BUFFER(2 * PRE_CODEWORD_LIMIT + 1));
                 lzx_flush_bits(os, 2 * PRE_CODEWORD_LIMIT + 1);
         }
 
@@ -1094,7 +1095,7 @@ lzx_write_sequences(struct lzx_output_bitstream *os, int block_type,
                                 ALIGNED_CODEWORD_LIMIT)
 
                 /* Verify optimization is enabled on 64-bit  */
-                STATIC_ASSERT(WORDBITS < 64 || CAN_BUFFER(MAX_MATCH_BITS));
+                STATIC_ASSERT_STMT(WORDBITS < 64 || CAN_BUFFER(MAX_MATCH_BITS));
 
                 /* Output the main symbol for the match.  */
 
@@ -1757,7 +1758,7 @@ lzx_find_min_cost_path(struct liblzx_compressor * const restrict c,
                         matchptr = in_next - lzx_lru_queue_R0(QUEUE(cur_node));
                         if (load_u16_unaligned(matchptr) != load_u16_unaligned(in_next))
                                 goto rep0_done;
-                        STATIC_ASSERT(LZX_MIN_MATCH_LEN == 2);
+                        STATIC_ASSERT_STMT(LZX_MIN_MATCH_LEN == 2);
                         do {
                                 uint32_t cost = cur_node->cost +
                                            c->costs.match_cost[0][
@@ -2393,7 +2394,7 @@ lzx_set_default_costs(struct liblzx_compressor *c)
         fixed_set_fraction(&frac_15_100, 15, 100);
 
         /* Some numbers here have been hardcoded to assume a bit cost of 64. */
-        STATIC_ASSERT(BIT_COST == 64);
+        STATIC_ASSERT_STMT(BIT_COST == 64);
 
         /* Estimate the number of literals that will used.  'num_literals' is
          * the total number, whereas 'num_used_literals' is the number of
