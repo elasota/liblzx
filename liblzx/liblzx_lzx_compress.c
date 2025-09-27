@@ -2634,8 +2634,7 @@ lzx_compress_near_optimal(struct liblzx_compressor * restrict c,
         resume_matchfinding:
                 do {
                         size_t min_match_pos = in_next - in_begin;
-                        min_match_pos -=
-                            min_size(min_match_pos, max_offset);
+                        min_match_pos -= min_size(min_match_pos, max_offset);
 
                         if (in_next >= next_search_pos &&
                                 likely(nice_len >= LZX_MIN_MATCH_LEN)) {
@@ -3432,7 +3431,8 @@ liblzx_compress_create(const struct liblzx_compress_properties *props)
                 /* Pad out to include past blocks and extra
                  * matchfinding space  */
                 c->in_buffer_capacity *= 2;
-                c->in_buffer_capacity += LZX_MAX_MATCH_LEN;
+                c->in_buffer_capacity +=
+                    LZX_MAX_MATCH_LEN + LZX_E8_FILTER_TAIL_SIZE;
         }
 
         if (c->variant == LIBLZX_VARIANT_WIM)
@@ -3531,7 +3531,10 @@ lzx_compress_chunk(struct liblzx_compressor *c)
         struct lzx_output_bitstream os;
         size_t result;
         bool e8_preprocess_enabled = (c->e8_chunk_offset < 0x40000000);
+        bool next_e8_preprocess_enabled =
+            (c->e8_chunk_offset + c->chunk_size < 0x40000000);
         uint32_t chunk_size = min_u32(c->chunk_size, c->in_used);
+        uint32_t next_chunk_preprocess_size = 0;
 
         uint8_t *in = (uint8_t *)c->in_buffer + c->in_prefix_size;
 
@@ -3541,11 +3544,32 @@ lzx_compress_chunk(struct liblzx_compressor *c)
                                c->e8_file_size);
         }
 
+        if (c->in_used > c->chunk_size && next_e8_preprocess_enabled) {
+                next_chunk_preprocess_size =
+                    min_u32(LZX_MAX_MATCH_LEN + LZX_E8_FILTER_TAIL_SIZE,
+                            c->in_used - c->chunk_size);
+        }
+
+        /* Preprocess enough of the next block input data for the
+           matchfinder */
+        if (next_chunk_preprocess_size > 0) {
+                lzx_preprocess(in + c->chunk_size, next_chunk_preprocess_size,
+                               c->e8_chunk_offset + c->chunk_size,
+                               c->e8_file_size);
+        }
+
         /* Initialize the output bitstream. */
         lzx_init_output(&os, c->out_buffer, c->out_buffer_capacity);
 
         /* Call the compression level-specific compress() function. */
         (*c->impl)(c, in, chunk_size, c->in_used, &os);
+
+        /* Undo next block preprocessing */
+        if (next_chunk_preprocess_size > 0) {
+                lzx_postprocess(in + c->chunk_size, next_chunk_preprocess_size,
+                               c->e8_chunk_offset + c->chunk_size,
+                               c->e8_file_size);
+        }
 
         /* Flush the output bitstream. */
         result = lzx_flush_output(&os);
@@ -3593,7 +3617,8 @@ liblzx_compress_add_input(liblzx_compressor_t *c, const void *in_data,
                 return 0;
 
         max_used = min_uint(c->in_buffer_capacity - c->in_prefix_size,
-                                c->chunk_size + LZX_MAX_MATCH_LEN);
+                            c->chunk_size + LZX_MAX_MATCH_LEN +
+                                LZX_E8_FILTER_TAIL_SIZE);
         fill_amount = min_size(in_data_size, max_used - c->in_used);
 
         memcpy(((uint8_t *)c->in_buffer) + c->in_prefix_size + c->in_used, in_data,

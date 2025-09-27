@@ -178,10 +178,10 @@ lzx_e8_filter(uint8_t *data, uint32_t size, uint32_t chunk_offset, uint32_t e8_f
         uint8_t *tail;
         uint8_t *p;
 
-        if (size <= 10)
+        if (size <= LZX_E8_FILTER_TAIL_SIZE)
                 return;
 
-        tail = &data[size - 10];
+        tail = &data[size - LZX_E8_FILTER_TAIL_SIZE];
         p = data;
         while (p < tail) {
                 if (*p != 0xE8) {
@@ -199,7 +199,7 @@ lzx_e8_filter(uint8_t *data, uint32_t size, uint32_t chunk_offset, uint32_t e8_f
         uint8_t *p = data;
         uint64_t valid_mask = ~0;
 
-        if (size <= 10)
+        if (size <= LZX_E8_FILTER_TAIL_SIZE)
                 return;
 #ifdef __AVX2__
 #  define ALIGNMENT_REQUIRED 32
@@ -209,7 +209,7 @@ lzx_e8_filter(uint8_t *data, uint32_t size, uint32_t chunk_offset, uint32_t e8_f
 
         /* Process one byte at a time until the pointer is properly aligned.  */
         while ((uintptr_t)p % ALIGNMENT_REQUIRED != 0) {
-                if (p >= data + size - 10)
+                if (p >= data + size - LZX_E8_FILTER_TAIL_SIZE)
                         return;
                 if (*p == 0xE8 && (valid_mask & 1)) {
                         (*process_target)(p + 1, p - data + chunk_offset,
@@ -297,7 +297,7 @@ lzx_e8_filter(uint8_t *data, uint32_t size, uint32_t chunk_offset, uint32_t e8_f
         }
 
         /* Approaching the end of the buffer; process one byte a time.  */
-        while (p < data + size - 10) {
+        while (p < data + size - LZX_E8_FILTER_TAIL_SIZE) {
                 if (*p == 0xE8 && (valid_mask & 1)) {
                         (*process_target)(p + 1, p - data + chunk_offset,
                                           e8_file_size);

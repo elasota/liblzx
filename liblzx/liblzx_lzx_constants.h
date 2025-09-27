@@ -97,6 +97,8 @@
  * This is probably WIM-specific.  */
 #define LZX_DEFAULT_BLOCK_SIZE          32768
 
+#define LZX_E8_FILTER_TAIL_SIZE         10
+
 /* Number of offsets in the recent (or "repeat") offsets queue.  */
 #define LZX_NUM_RECENT_OFFSETS          3
 
