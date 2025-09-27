@@ -31,8 +31,15 @@
 #ifndef _LIBLZX_COMPILER_H
 #define _LIBLZX_COMPILER_H
 
+#if defined(_MSC_VER) && !defined(__clang__) && !defined(__GNUC__)
+#define LIBLZX_IS_MSVC_COMPILER 1
+#else
+#define LIBLZX_IS_MSVC_COMPILER 0
+#endif
+
 #if LIBLZX_IS_MSVC_COMPILER
 #include <stdint.h>
+#include <stddef.h>
 
 #pragma warning(error:4013)
 #endif
@@ -53,12 +60,6 @@
         (!defined(__clang__) && !defined(__INTEL_COMPILER) &&                \
          (__GNUC__ > major ||                                                \
           (__GNUC__ == major && __GNUC_MINOR__ >= minor)))
-
-#if defined(_MSC_VER) && !defined(__clang__) && !defined(__GNUC__)
-#define LIBLZX_IS_MSVC_COMPILER 1
-#else
-#define LIBLZX_IS_MSVC_COMPILER 0
-#endif
 
 /* Feature-test macros defined by recent versions of clang.  */
 #ifndef __has_attribute
