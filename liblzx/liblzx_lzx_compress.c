@@ -922,11 +922,7 @@ lzx_write_compressed_code(struct lzx_output_bitstream *os,
         uint32_t precode_freqs[LZX_PRECODE_NUM_SYMBOLS];
         uint8_t precode_lens[LZX_PRECODE_NUM_SYMBOLS];
         uint32_t precode_codewords[LZX_PRECODE_NUM_SYMBOLS];
-#if LIBLZX_IS_MSVC_COMPILER
-        unsigned *precode_items = (unsigned *)_alloca(sizeof(unsigned) * num_lens);
-#else
-        unsigned precode_items[num_lens];
-#endif
+        unsigned *precode_items = (unsigned *)alloca(sizeof(unsigned) * num_lens);
         unsigned num_precode_items;
         unsigned precode_item;
         unsigned precode_sym;
