@@ -1028,7 +1028,6 @@ static cab_UWORD compress_LZX(FCI_Int *fci)
     if (fci->cDataBlocksIn == 0) {
         /* First block, restart compression */
         int window_size_bits = LZXCompressionWindowFromTCOMP(fci->compression);
-        size_t window_size = 1 << window_size_bits;
         liblzx_compress_properties_t props;
 
         if (fci->lzx_compressor)
