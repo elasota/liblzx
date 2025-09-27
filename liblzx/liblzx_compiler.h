@@ -171,11 +171,7 @@
 
 /* Swap the values of two variables, without multiple evaluation.  */
 #ifndef swap
-#  if LIBLZX_IS_MSVC_COMPILER
-#    define swap(a, b) do { typeof(a) _a = (a); (a) = (b); (b) = _a; } while(0)
-#  else
-#    define swap(a, b) ({ typeof(a) _a = (a); (a) = (b); (b) = _a; })
-#  endif
+#  define swap(a, b) do { typeof(a) _a = (a); (a) = (b); (b) = _a; } while(0)
 #endif
 #define SWAP(a, b)        swap((a), (b))
 
@@ -190,11 +186,11 @@
 
 /* STATIC_ASSERT() - verify the truth of an expression at compilation time.  */
 #ifdef __CHECKER__
-#define STATIC_ASSERT(expr)
-#define STATIC_ASSERT_STMT(expr)
+#  define STATIC_ASSERT(expr)
+#  define STATIC_ASSERT_STMT(expr)
 #elif __STDC_VERSION__ >= 201112L
 #  define STATIC_ASSERT(expr)        _Static_assert((expr), "")
-#  define STATIC_ASSERT_STMT(expr)   ({_Static_assert((expr), "");})
+#  define STATIC_ASSERT_STMT(expr)   do {_Static_assert((expr), "");} while(0)
 #else
 #  define STATIC_ASSERT(expr)        ((void)sizeof(char[1 - 2 * !(expr)]))
 #  define STATIC_ASSERT_STMT(expr)   STATIC_ASSERT(expr)

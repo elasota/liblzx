@@ -190,6 +190,8 @@
 
 #include <assert.h>
 
+#include <malloc.h>
+
 /* Note: BT_MATCHFINDER_HASH2_ORDER must be defined before including
  * bt_matchfinder.h. */
 
