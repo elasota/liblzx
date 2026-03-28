@@ -2895,45 +2895,52 @@ lzx_finish_sequence(struct lzx_sequence *last_seq, uint32_t litrunlen)
  */
 static unsigned
 lzx_find_longest_repeat_offset_match(const uint8_t * const in_next,
-                                     const uint32_t recent_offsets[],
-                                     const unsigned max_len,
-                                     unsigned *best_rep_idx_ret)
+				     const uint32_t recent_offsets[],
+				     const unsigned max_len,
+				     const size_t max_offset,
+				     unsigned *best_rep_idx_ret)
 {
-        STATIC_ASSERT(LZX_NUM_RECENT_OFFSETS == 3); /* loop is unrolled */
+	STATIC_ASSERT(LZX_NUM_RECENT_OFFSETS == 3); /* loop is unrolled */
 
-        const uint32_t seq3 = load_u24_unaligned(in_next);
-        const uint8_t *matchptr;
-        unsigned best_rep_len = 0;
-        unsigned best_rep_idx = 0;
-        unsigned rep_len;
+	const uint32_t seq3 = load_u24_unaligned(in_next);
+	const uint8_t *matchptr;
+	unsigned best_rep_len = 0;
+	unsigned best_rep_idx = 0;
+	unsigned rep_len;
 
-        /* Check for rep0 match (most recent offset) */
-        matchptr = in_next - recent_offsets[0];
-        if (load_u24_unaligned(matchptr) == seq3)
-                best_rep_len = lz_extend(in_next, matchptr, 3, max_len);
+	/* Check for rep0 match (most recent offset) */
+	if (recent_offsets[0] <= max_offset) {
+		matchptr = in_next - recent_offsets[0];
+		if (load_u24_unaligned(matchptr) == seq3)
+			best_rep_len = lz_extend(in_next, matchptr, 3, max_len);
+	}
 
-        /* Check for rep1 match (second most recent offset) */
-        matchptr = in_next - recent_offsets[1];
-        if (load_u24_unaligned(matchptr) == seq3) {
-                rep_len = lz_extend(in_next, matchptr, 3, max_len);
-                if (rep_len > best_rep_len) {
-                        best_rep_len = rep_len;
-                        best_rep_idx = 1;
-                }
-        }
+	/* Check for rep1 match (second most recent offset) */
+	if (recent_offsets[1] <= max_offset) {
+		matchptr = in_next - recent_offsets[1];
+		if (load_u24_unaligned(matchptr) == seq3) {
+			rep_len = lz_extend(in_next, matchptr, 3, max_len);
+			if (rep_len > best_rep_len) {
+				best_rep_len = rep_len;
+				best_rep_idx = 1;
+			}
+		}
+	}
 
-        /* Check for rep2 match (third most recent offset) */
-        matchptr = in_next - recent_offsets[2];
-        if (load_u24_unaligned(matchptr) == seq3) {
-                rep_len = lz_extend(in_next, matchptr, 3, max_len);
-                if (rep_len > best_rep_len) {
-                        best_rep_len = rep_len;
-                        best_rep_idx = 2;
-                }
-        }
+	/* Check for rep2 match (third most recent offset) */
+	if (recent_offsets[2] <= max_offset) {
+		matchptr = in_next - recent_offsets[2];
+		if (load_u24_unaligned(matchptr) == seq3) {
+			rep_len = lz_extend(in_next, matchptr, 3, max_len);
+			if (rep_len > best_rep_len) {
+				best_rep_len = rep_len;
+				best_rep_idx = 2;
+			}
+		}
+	}
 
-        *best_rep_idx_ret = best_rep_idx;
-        return best_rep_len;
+	*best_rep_idx_ret = best_rep_idx;
+	return best_rep_len;
 }
 
 /*
@@ -3125,6 +3132,7 @@ lzx_compress_lazy(struct liblzx_compressor * restrict c,
                         best_rep_len = lzx_find_longest_repeat_offset_match(in_next,
                                                                             recent_offsets,
                                                                             max_produce_len,
+                                                                            in_next - in_begin,
                                                                             &best_rep_idx);
                         in_next++;
 
@@ -3192,6 +3200,7 @@ lzx_compress_lazy(struct liblzx_compressor * restrict c,
                         best_rep_len = lzx_find_longest_repeat_offset_match(in_next,
                                                                             recent_offsets,
                                                                             max_produce_len,
+                                                                            in_next - in_begin,
                                                                             &best_rep_idx);
                         in_next++;
 
