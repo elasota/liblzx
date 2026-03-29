@@ -1,7 +1,7 @@
 /*
  * lzx_compress.c
  *
- * A compressor for the LZX compression format, as used in WIM archives.
+ * A compressor for the LZX compression format, as used in WIM and CAB archives.
  */
 
 /*
