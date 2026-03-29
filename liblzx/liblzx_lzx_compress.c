@@ -3385,6 +3385,7 @@ lzx_reset(struct liblzx_compressor *c)
         c->next_hashes[0] = 0;
         c->next_hashes[1] = 0;
 
+        /* Reset algorithm-specific things */
         c->reset(c);
 }
 
@@ -3595,6 +3596,12 @@ lzx_compress_chunk(struct liblzx_compressor *c)
         /* Return the number of compressed bytes, or 0 if the input did not
          * compress to less than its original size. */
         return result;
+}
+
+void
+liblzx_compress_reset(liblzx_compressor_t *c)
+{
+        lzx_reset(c);
 }
 
 void
