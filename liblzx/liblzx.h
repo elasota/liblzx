@@ -111,8 +111,8 @@ liblzx_compress_reset(liblzx_compressor_t *stream);
 
 /* Adds input data to the compression stream and returns the number of bytes
  * digested.  The return value will never exceed in_data_size.  If this
- * returns a value smaller than in_data_size, then a compressed block was
- * produced and must be released with liblzx_compress_release_next_block
+ * returns a value smaller than in_data_size, then a compressed chunk was
+ * produced and must be released with liblzx_compress_release_next_chunk
  * before more data can be added.
  */
 size_t
